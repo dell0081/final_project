@@ -14,6 +14,6 @@ part 'customer_database.g.dart'; // the generated code will be there
 @Database(version: 1, entities: [Customer])
 abstract class CustomerDatabase extends FloorDatabase{
 // get interface to Database
-  CustomerDAO getDao();
+  CustomerDAO get customerDao;
 
 }

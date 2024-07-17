@@ -5,7 +5,7 @@ import 'package:floor/floor.dart';
 class Customer{
 
 @PrimaryKey(autoGenerate: true)// unique id
-  final int? id;
+  final int id;
 
 
   final String firstName;
