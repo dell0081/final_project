@@ -1,6 +1,7 @@
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:final_project/customer_dao.dart';
 import 'package:final_project/customer_database.dart';
+import 'package:floor/floor.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'customer.dart';
@@ -84,6 +85,41 @@ class CustomerListPageState extends State<CustomerListPage> {
     }
   }
 
+  Future<void> update1(Customer customer) async {
+    setState(() {
+      _customersFirstNameController.text = customer.firstName;
+      _customersLastNameController.text = customer.lastName;
+      _customersBirthdayController.text = customer.birthday;
+      _customersAddressController.text = customer.address;
+      addButtonText = "update";
+
+    });
+
+   // final temp = await myDAO.getCustomer(id).first;
+    final temp = customer;
+    if (temp != null) {
+      await myDAO.updateCustomer(temp);
+      display();
+    }
+  }
+
+  Future<void> update2(Customer customer) async {
+    setState(() {
+      _customersFirstNameController.text = customer.firstName;
+      _customersLastNameController.text = customer.lastName;
+      _customersBirthdayController.text = customer.birthday;
+      _customersAddressController.text = customer.address;
+
+    });
+
+    // final temp = await myDAO.getCustomer(id).first;
+    final temp = customer;
+    if (temp != null) {
+      await myDAO.updateCustomer(temp);
+      display();
+    }
+  }
+
   void displayAlert(Customer customer) {
     showDialog<String>(
         context: context,
@@ -119,6 +155,13 @@ class CustomerListPageState extends State<CustomerListPage> {
                     Navigator.pop(context);
                   },
                 ),
+                ElevatedButton(
+                  child: const Text('Update'),
+                  onPressed: () {
+                    update1(customer);
+                    Navigator.pop(context);
+                  },
+                ),
               ],
             ));
   }
@@ -133,7 +176,32 @@ class CustomerListPageState extends State<CustomerListPage> {
       _customersBirthdayController
     ];
     names = <String>["FirstName", "LastName", "Address", "Birthday"];
+    addButtonText = Text('Add');
+    addButton = ElevatedButton(
+      child:  addButtonText,
+      onPressed: () {
+        bool correct = true;
+        EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
+        var values = <String>[];
+        for (var i = 0; i < controllers.length; i++) {
+          final value = controllers[i].value.text;
+          if (value == "") {
+            correct = false;
+            break;
+          }
 
+          values.add(value);
+        }
+        if (correct) {
+          for (var i = 0; i < controllers.length; i++) {
+            prefs.setString(names[i], values[i]);
+          }
+          add(values[0], values[1], values[2], values[3]);
+        } else {
+          emptyInputSnackBar();
+        }
+      },
+    );
     $FloorCustomerDatabase
         .databaseBuilder('app_database.db')
         .build()
@@ -156,7 +224,8 @@ class CustomerListPageState extends State<CustomerListPage> {
     _customersBirthdayController.dispose();
     super.dispose();
   }
-
+late ElevatedButton addButton;
+  late Text addButtonText;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -221,31 +290,8 @@ class CustomerListPageState extends State<CustomerListPage> {
                 ),
               ],
             ),
-            ElevatedButton(
-              child: const Text('Add'),
-              onPressed: () {
-                bool correct = true;
-                EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
-                var values = <String>[];
-                for (var i = 0; i < controllers.length; i++) {
-                  final value = controllers[i].value.text;
-                  if (value == "") {
-                    correct = false;
-                    break;
-                  }
+            addButton,
 
-                  values.add(value);
-                }
-                if (correct) {
-                  for (var i = 0; i < controllers.length; i++) {
-                    prefs.setString(names[i], values[i]);
-                  }
-                  add(values[0], values[1], values[2], values[3]);
-                } else {
-                  emptyInputSnackBar();
-                }
-              },
-            ),
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
