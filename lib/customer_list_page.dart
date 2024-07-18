@@ -74,35 +74,37 @@ class CustomerListPageState extends State<CustomerListPage> {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
             }));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
   }
+
   Future<void> delete(int id) async {
     final temp = await myDAO.getCustomer(id).first;
     if (temp != null) {
       await myDAO.deleteCustomer(temp);
-
+      display();
     }
   }
 
-
-  void displayAlert(Customer customer){
-
+  void displayAlert(Customer customer) {
     showDialog<String>(
         context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              content:  Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                   const Align(alignment:Alignment.centerLeft, child:Text( 'Added Customer')),
-                    Align(alignment:Alignment.centerLeft, child:Text( 'First Name ${customer.firstName}')),
-                    Align(alignment:Alignment.centerLeft, child:Text('Last Name ${customer.lastName}')),
-                    Align(alignment:Alignment.centerLeft, child:Text('Birthday ${customer.birthday}')),
-                    Align(alignment:Alignment.centerLeft, child:Text('Address ${customer.address}')),
-
-
-                  ]
-              ),
+        builder: (BuildContext context) => AlertDialog(
+              content: Column(mainAxisSize: MainAxisSize.min, children: [
+                const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Added Customer')),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('First Name ${customer.firstName}')),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Last Name ${customer.lastName}')),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Birthday ${customer.birthday}')),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Address ${customer.address}')),
+              ]),
               actions: <Widget>[
                 ElevatedButton(
                   child: const Text('Ok'),
@@ -113,21 +115,13 @@ class CustomerListPageState extends State<CustomerListPage> {
                 ElevatedButton(
                   child: const Text('Delete'),
                   onPressed: () {
-                    setState(() {
-                      delete(customer.id);
-                      Navigator.pop(context);
-                      display();
-                    });
-
-
+                    delete(customer.id);
+                    Navigator.pop(context);
                   },
                 ),
-
               ],
-            )
-    );
+            ));
   }
-
 
   @override
   void initState() {
