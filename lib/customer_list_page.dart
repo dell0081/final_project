@@ -76,6 +76,15 @@ class CustomerListPageState extends State<CustomerListPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
   }
+  Future<void> delete(int id) async {
+    final temp = await myDAO.getCustomer(id).first;
+    if (temp != null) {
+      await myDAO.deleteCustomer(temp);
+
+    }
+  }
+
+
   void displayAlert(Customer customer){
 
     showDialog<String>(
@@ -101,6 +110,19 @@ class CustomerListPageState extends State<CustomerListPage> {
                     Navigator.pop(context);
                   },
                 ),
+                ElevatedButton(
+                  child: const Text('Delete'),
+                  onPressed: () {
+                    setState(() {
+                      delete(customer.id);
+                      Navigator.pop(context);
+                      display();
+                    });
+
+
+                  },
+                ),
+
               ],
             )
     );
@@ -236,10 +258,17 @@ class CustomerListPageState extends State<CustomerListPage> {
                 itemCount: customers.length,
                 itemBuilder: (context, index) {
                   final customer = customers[index];
-                  return ListTile(
-                    title: Text('${customer.firstName} ${customer.lastName}'),
-                    subtitle: Text(
-                        'Address: ${customer.address}\nBirthday: ${customer.birthday}'),
+                  return GestureDetector(
+                    child: ListTile(
+                      title: Text('${customer.firstName} ${customer.lastName}'),
+                      subtitle: Text(
+                          'Address: ${customer.address}\nBirthday: ${customer.birthday}'),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        displayAlert(customer);
+                      });
+                    },
                   );
                 },
               ),

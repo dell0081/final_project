@@ -15,7 +15,10 @@ abstract class CustomerDAO{
   @update
   Future<int> updateCustomer(Customer cstm);
 
+  @Query('Select * from customer where id = :id')
+  Stream<Customer?> getCustomer(int id);
+
   @Query('Select *  from customer')
-  Future<List< Customer > >getAllCustomers();
+  Future<List<Customer>> getAllCustomers();
 
  }

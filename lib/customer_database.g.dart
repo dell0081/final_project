@@ -114,7 +114,7 @@ class _$CustomerDAO extends CustomerDAO {
   _$CustomerDAO(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database),
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
         _customerInsertionAdapter = InsertionAdapter(
             database,
             'Customer',
@@ -124,7 +124,8 @@ class _$CustomerDAO extends CustomerDAO {
                   'lastName': item.lastName,
                   'address': item.address,
                   'birthday': item.birthday
-                }),
+                },
+            changeListener),
         _customerUpdateAdapter = UpdateAdapter(
             database,
             'Customer',
@@ -135,7 +136,8 @@ class _$CustomerDAO extends CustomerDAO {
                   'lastName': item.lastName,
                   'address': item.address,
                   'birthday': item.birthday
-                }),
+                },
+            changeListener),
         _customerDeletionAdapter = DeletionAdapter(
             database,
             'Customer',
@@ -146,7 +148,8 @@ class _$CustomerDAO extends CustomerDAO {
                   'lastName': item.lastName,
                   'address': item.address,
                   'birthday': item.birthday
-                });
+                },
+            changeListener);
 
   final sqflite.DatabaseExecutor database;
 
@@ -159,6 +162,20 @@ class _$CustomerDAO extends CustomerDAO {
   final UpdateAdapter<Customer> _customerUpdateAdapter;
 
   final DeletionAdapter<Customer> _customerDeletionAdapter;
+
+  @override
+  Stream<Customer?> getCustomer(int id) {
+    return _queryAdapter.queryStream('Select * from customer where id = ?1',
+        mapper: (Map<String, Object?> row) => Customer(
+            row['id'] as int,
+            row['firstName'] as String,
+            row['lastName'] as String,
+            row['address'] as String,
+            row['birthday'] as String),
+        arguments: [id],
+        queryableName: 'customer',
+        isView: false);
+  }
 
   @override
   Future<List<Customer>> getAllCustomers() async {
