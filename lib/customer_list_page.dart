@@ -8,7 +8,9 @@ import 'dart:math';
 import 'customer.dart';
 
 class CustomerListPage extends StatefulWidget {
-  const CustomerListPage({super.key});
+  final void Function(Locale) onLocaleChange;
+
+  const CustomerListPage({super.key, required this.onLocaleChange});
 
   @override
   State<CustomerListPage> createState() {
@@ -17,21 +19,15 @@ class CustomerListPage extends StatefulWidget {
 }
 
 class CustomerListPageState extends State<CustomerListPage> {
-  final englishLocale = const Locale("en", "CA");
-  final frenchLocale = const Locale("fr", "FR");
+  final Locale englishLocale = const Locale("en", "CA");
+  final Locale frenchLocale = const Locale("fr", "FR");
   late Locale _locale;
 
-
-
   var customers = <Customer>[];
-  final TextEditingController _customersFirstNameController =
-      TextEditingController();
-  final TextEditingController _customersLastNameController =
-      TextEditingController();
-  final TextEditingController _customersAddressController =
-      TextEditingController();
-  final TextEditingController _customersBirthdayController =
-      TextEditingController();
+  final TextEditingController _customersFirstNameController = TextEditingController();
+  final TextEditingController _customersLastNameController = TextEditingController();
+  final TextEditingController _customersAddressController = TextEditingController();
+  final TextEditingController _customersBirthdayController = TextEditingController();
   var controllers = <TextEditingController>[];
   var names = <String>[];
   EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
@@ -41,9 +37,7 @@ class CustomerListPageState extends State<CustomerListPage> {
   Customer? selected;
 
   void changeLanguage(Locale newLocale) {
-    setState(() {
-      _locale = newLocale;
-    });
+    widget.onLocaleChange(newLocale);
   }
 
   void clearAll() {
@@ -62,8 +56,8 @@ class CustomerListPageState extends State<CustomerListPage> {
     return (width > height) && (width > 720);
   }
 
-  String translate(String word){
-    return AppLocalizations.of(context)?.translate(word)??'Hello';
+  String translate(String word) {
+    return AppLocalizations.of(context)?.translate(word) ?? 'Hello';
   }
 
   Future<void> displayPrevious() async {
@@ -96,9 +90,7 @@ class CustomerListPageState extends State<CustomerListPage> {
   late CustomerDAO myDAO;
 
   Future<int> checkId() async {
-    int maxId = customers.isNotEmpty
-        ? customers.map((customer) => customer.id).reduce(max)
-        : 0;
+    int maxId = customers.isNotEmpty ? customers.map((customer) => customer.id).reduce(max) : 0;
 
     return maxId + 1;
   }
@@ -110,22 +102,23 @@ class CustomerListPageState extends State<CustomerListPage> {
     });
   }
 
-  Future<void> add(String firstName, String lastName, String address,
-      String birthday) async {
+  Future<void> add(String firstName, String lastName, String address, String birthday) async {
     int id = await checkId();
 
     final customer = Customer(id, firstName, lastName, address, birthday);
     await addAndUpdate(customer);
   }
 
-  void emptyInputSnackBar() {
+  void emptyInputSnackBar(BuildContext context) {
     final snackBar = SnackBar(
-        content: const Text('All information should be provided'),
-        action: SnackBarAction(
-            label: 'OK',
-            onPressed: () {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            }));
+      content: const Text('All information should be provided'),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -162,12 +155,12 @@ class CustomerListPageState extends State<CustomerListPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text.rich(
                 TextSpan(
-                  text: 'Delete this customer?',
-                  style: TextStyle(
+                  text: translate('delete'),
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.purple, // Highlight color
                   ),
@@ -229,12 +222,12 @@ class CustomerListPageState extends State<CustomerListPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text.rich(
                 TextSpan(
-                  text: 'Customer List Help',
-                  style: TextStyle(
+                  text: translate('helpTitle'),
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.purple, // Highlight color
                   ),
@@ -249,28 +242,26 @@ class CustomerListPageState extends State<CustomerListPage> {
                 1: FlexColumnWidth(),
                 // Flexible width for the second column
               },
-              children: const [
+              children: [
                 TableRow(children: [
-                  Text('+', style: TextStyle(fontSize: 15)),
-                  Text('Add New Customer', style: TextStyle(fontSize: 12)),
+                  const Text('+', style: TextStyle(fontSize: 15)),
+                  Text(translate('add'), style: const TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
-                  Icon(Icons.clear),
-                  Text('Clear Customer Information',
-                      style: TextStyle(fontSize: 12)),
+                  const Icon(Icons.clear),
+                  Text(translate('clear'), style: const TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
-                  Icon(Icons.arrow_back),
-                  Text('Previous Customer Information',
-                      style: TextStyle(fontSize: 12)),
+                  const Icon(Icons.arrow_back),
+                  Text(translate('previous'), style: const TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
-                  Icon(Icons.check_box),
-                  Text('Update Customer', style: TextStyle(fontSize: 12)),
+                  const Icon(Icons.check_box),
+                  Text(translate('update'), style: const TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
-                  Text('-', style: TextStyle(fontSize: 15)),
-                  Text('Delete Customer', style: TextStyle(fontSize: 12)),
+                  const Text('-', style: TextStyle(fontSize: 15)),
+                  Text(translate('delete'), style: const TextStyle(fontSize: 12)),
                 ]),
               ],
             ),
@@ -287,6 +278,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       ),
     );
   }
+
   void showChangeLanguage() {
     showDialog<String>(
       context: context,
@@ -307,7 +299,6 @@ class CustomerListPageState extends State<CustomerListPage> {
               ),
             ),
             SizedBox(height: 16),
-
           ],
         ),
         actions: <Widget>[
@@ -402,7 +393,7 @@ class CustomerListPageState extends State<CustomerListPage> {
           Expanded(
             child: TextField(
               controller: _customersFirstNameController,
-              decoration:  InputDecoration(
+              decoration: InputDecoration(
                 border: const OutlineInputBorder(),
                 hintText: translate('firstName'),
               ),
@@ -416,9 +407,9 @@ class CustomerListPageState extends State<CustomerListPage> {
           Expanded(
             child: TextField(
               controller: _customersLastNameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Add Last Name',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: translate('lastName'),
               ),
             ),
           ),
@@ -430,9 +421,9 @@ class CustomerListPageState extends State<CustomerListPage> {
           Expanded(
             child: TextField(
               controller: _customersBirthdayController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Add Birthdate',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: translate('birthdate'),
               ),
               onTap: () async {
                 DateTime? date = await showDatePicker(
@@ -443,7 +434,7 @@ class CustomerListPageState extends State<CustomerListPage> {
                 );
                 if (date != null) {
                   _customersBirthdayController.text =
-                      '${date.month}-${date.day}-${date.year}';
+                  '${date.month}-${date.day}-${date.year}';
                 }
               },
             ),
@@ -456,9 +447,9 @@ class CustomerListPageState extends State<CustomerListPage> {
           Expanded(
             child: TextField(
               controller: _customersAddressController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Add Address',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: translate('address'),
               ),
             ),
           ),
@@ -497,7 +488,7 @@ class CustomerListPageState extends State<CustomerListPage> {
 
               add(values[0], values[1], values[2], values[3]);
             } else {
-              emptyInputSnackBar();
+              emptyInputSnackBar(context);
             }
           },
         ),
@@ -534,7 +525,7 @@ class CustomerListPageState extends State<CustomerListPage> {
                     updateId, values[0], values[1], values[2], values[3]);
                 update2(updatedCustomer);
               } else {
-                emptyInputSnackBar();
+                emptyInputSnackBar(context);
               }
             },
           ),
@@ -570,68 +561,77 @@ class CustomerListPageState extends State<CustomerListPage> {
       ],
     );
   }
-
+Widget customerPage(){
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)?.translate('title') ?? 'Customer List'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              showChangeLanguage();
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: landscape()
+            ? Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Container(
+                child: list(),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                child: details(true),
+              ),
+            ),
+          ],
+        )
+            : Column(
+          children: <Widget>[
+            Container(
+              child: details(false),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Container(
+                child: list(),
+              ),
+            ),
+            helpButtonRow(),
+          ],
+        ),
+      ),
+    );
+}
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        supportedLocales: [ frenchLocale, englishLocale ],
+    return  MaterialApp(
+      supportedLocales: const [
+        Locale('en', 'CA'),
+        Locale('fr', 'FR'),
+      ],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      locale:_locale,
+      home: customerPage(),
 
-        localizationsDelegates: const[
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate
-
-        ],
-       locale:_locale,
-        title: 'Hello',
-
-        home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Customer List'),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.help_outline),
-                onPressed: () {
-                  showChangeLanguage();
-                },
-              ),
-            ],
-          ),
-
-          body: Center(
-            child: landscape()
-                ? Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          child: list(),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          child: details(true),
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: <Widget>[
-                      Container(
-                        child: details(false),
-                      ),
-                      const SizedBox(height: 20),
-                      Expanded(
-                        child: Container(
-                          child: list(),
-                        ),
-                      ),
-                      helpButtonRow(),
-                    ],
-                  ),
-          ),
-        ));
+    );
   }
 }
+
+
+
+
+
+
+
