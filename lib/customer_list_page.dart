@@ -1,7 +1,7 @@
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:final_project/customer_dao.dart';
 import 'package:final_project/customer_database.dart';
-import 'package:floor/floor.dart';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'customer.dart';
@@ -27,29 +27,46 @@ class CustomerListPageState extends State<CustomerListPage> {
       TextEditingController();
   var controllers = <TextEditingController>[];
   var names = <String>[];
-
-
+  EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
+  bool previous = false;
   bool updated = false;
   int updateId = 0;
-
-
-
-
-
-
+  Customer? selected;
 
   void clearAll() {
     for (var controller in controllers) {
       controller.clear();
     }
+    setState(() {
+      updated = false;
+    });
   }
 
+  Future<void> displayPrevious() async {
+    for (var i = 0; i < controllers.length; i++) {
+      controllers[i].text = await prefs.getString(names[i]);
+    }
+
+    display();
+  }
+
+  Future<DateTime?> selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    return pickedDate;
+  }
 
   Future<void> addAndUpdate(Customer customer) async {
     await myDAO.insertCustomer(customer);
     display();
     clearAll();
-    displayAlert(customer);
+    setState(() {
+      previous = true;
+    });
   }
 
   late CustomerDAO myDAO;
@@ -92,6 +109,7 @@ class CustomerListPageState extends State<CustomerListPage> {
     final temp = await myDAO.getCustomer(id).first;
     if (temp != null) {
       await myDAO.deleteCustomer(temp);
+      clearAll();
       display();
     }
   }
@@ -100,77 +118,85 @@ class CustomerListPageState extends State<CustomerListPage> {
     setState(() {
       updated = true;
       updateId = customer.id;
+      selected = customer;
       _customersFirstNameController.text = customer.firstName;
       _customersLastNameController.text = customer.lastName;
       _customersBirthdayController.text = customer.birthday;
       _customersAddressController.text = customer.address;
     });
-
-    // final temp = await myDAO.getCustomer(id).first;
-    final temp = customer;
-    if (temp != null) {
-      await myDAO.updateCustomer(temp);
-      display();
-    }
   }
 
   Future<void> update2(Customer customer) async {
-    setState(() {
-          updated = false;
-    });
-
-    // final temp = await myDAO.getCustomer(id).first;
-    final temp = customer;
-    if (temp != null) {
-      await myDAO.updateCustomer(temp);
-      display();
-    }
+    await myDAO.updateCustomer(customer);
+    display();
   }
 
   void displayAlert(Customer customer) {
     showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-              content: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Added Customer')),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('First Name ${customer.firstName}')),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Last Name ${customer.lastName}')),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Birthday ${customer.birthday}')),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Address ${customer.address}')),
-              ]),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: const Text('Ok'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text.rich(
+                TextSpan(
+                  text: 'Delete this customer?',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple, // Highlight color
+                  ),
                 ),
-                ElevatedButton(
-                  child: const Text('Delete'),
-                  onPressed: () {
-                    delete(customer.id);
-                    Navigator.pop(context);
-                  },
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Add some spacing between the title and content
+            Row(
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('First Name:'),
+                      Text('Last Name:'),
+                      Text('Birthday:'),
+                      Text('Address:'),
+                    ],
+                  ),
                 ),
-                ElevatedButton(
-                  child: const Text('Update'),
-                  onPressed: () {
-                    update1(customer);
-                    Navigator.pop(context);
-                  },
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(customer.firstName),
+                      Text(customer.lastName),
+                      Text(customer.birthday),
+                      Text(customer.address),
+                    ],
+                  ),
                 ),
               ],
-            ));
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Delete'),
+            onPressed: () {
+              delete(customer.id);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -253,6 +279,18 @@ class CustomerListPageState extends State<CustomerListPage> {
                       border: OutlineInputBorder(),
                       hintText: 'Add Birthdate',
                     ),
+                    onTap: () async {
+                      DateTime? date = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime(2000),
+                        firstDate: DateTime(1967),
+                        lastDate: DateTime.now(),
+                      );
+                      if (date != null) {
+                        _customersBirthdayController.text =
+                            '${date.month}-${date.day}-${date.year}';
+                      }
+                    },
                   ),
                 ),
               ],
@@ -271,58 +309,76 @@ class CustomerListPageState extends State<CustomerListPage> {
                 ),
               ],
             ),
-            updated?
-            ElevatedButton(
-              child: const Text('Update'),
-              onPressed: () {
-                bool correct = true;
-                EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
-                var values = <String>[];
-                for (var i = 0; i < controllers.length; i++) {
-                  final value = controllers[i].value.text;
-                  if (value == "") {
-                    correct = false;
-                    break;
-                  }
+            Row(children: [
+              ElevatedButton(
+                child: const Text('Add'),
+                onPressed: () {
+                  bool correct = true;
 
-                  values.add(value);
-                }
-                if (correct) {
+                  var values = <String>[];
                   for (var i = 0; i < controllers.length; i++) {
-                    prefs.setString(names[i], values[i]);
-                  }
-                  final updatedCustomer = Customer(updateId, values[0], values[1], values[2], values[3]);
-                  update2(updatedCustomer);
-                } else {
-                  emptyInputSnackBar();
-                }
-              },
-            ):
-            ElevatedButton(
-              child: const Text('Add'),
-              onPressed: () {
-                bool correct = true;
-                EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
-                var values = <String>[];
-                for (var i = 0; i < controllers.length; i++) {
-                  final value = controllers[i].value.text;
-                  if (value == "") {
-                    correct = false;
-                    break;
-                  }
+                    final value = controllers[i].value.text;
+                    if (value == "") {
+                      correct = false;
+                      break;
+                    }
 
-                  values.add(value);
-                }
-                if (correct) {
-                  for (var i = 0; i < controllers.length; i++) {
-                    prefs.setString(names[i], values[i]);
+                    values.add(value);
                   }
-                  add(values[0], values[1], values[2], values[3]);
-                } else {
-                  emptyInputSnackBar();
-                }
-              },
-            ),
+                  if (correct) {
+                    for (var i = 0; i < controllers.length; i++) {
+                      prefs.setString(names[i], values[i]);
+                    }
+
+                    add(values[0], values[1], values[2], values[3]);
+                  } else {
+                    emptyInputSnackBar();
+                  }
+                },
+              ),
+              ElevatedButton(
+                  child: const Text('Clear'),
+                  onPressed: () {
+                    clearAll();
+                  }),
+              if (previous)
+                ElevatedButton(
+                    child: const Text('Previous'),
+                    onPressed: () {
+                      displayPrevious();
+                    }),
+              if (updated) ...[
+                ElevatedButton(
+                  child: const Text('Update'),
+                  onPressed: () {
+                    bool correct = true;
+                    var values = <String>[];
+                    for (var i = 0; i < controllers.length; i++) {
+                      final value = controllers[i].value.text;
+                      if (value == "") {
+                        correct = false;
+                        break;
+                      }
+
+                      values.add(value);
+                    }
+                    if (correct) {
+                      final updatedCustomer = Customer(
+                          updateId, values[0], values[1], values[2], values[3]);
+                      update2(updatedCustomer);
+                    } else {
+                      emptyInputSnackBar();
+                    }
+                  },
+                ),
+                ElevatedButton(
+                    child: const Text('Delete'),
+                    onPressed: () {
+                      displayAlert(selected!);
+                      // delete(updateId);
+                    }),
+              ]
+            ]),
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
@@ -331,13 +387,18 @@ class CustomerListPageState extends State<CustomerListPage> {
                   final customer = customers[index];
                   return GestureDetector(
                     child: ListTile(
+                      leading: updated && customer.id == updateId
+                          ? const Icon(Icons.star)
+                          : const Icon(Icons.flutter_dash),
                       title: Text('${customer.firstName} ${customer.lastName}'),
-                      subtitle: Text(
-                          'Address: ${customer.address}\nBirthday: ${customer.birthday}'),
+                      // subtitle: Text('Address: ${customer.address}\nBirthday: ${customer.birthday}'),
                     ),
                     onTap: () {
                       setState(() {
-                        displayAlert(customer);
+                        updated = true;
+                        updateId = customer.id;
+                        update1(customer);
+                        // displayAlert(customer);
                       });
                     },
                   );
