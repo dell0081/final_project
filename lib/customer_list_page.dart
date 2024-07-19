@@ -1,7 +1,6 @@
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:final_project/customer_dao.dart';
 import 'package:final_project/customer_database.dart';
-
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'customer.dart';
@@ -17,14 +16,10 @@ class CustomerListPage extends StatefulWidget {
 
 class CustomerListPageState extends State<CustomerListPage> {
   var customers = <Customer>[];
-  final TextEditingController _customersFirstNameController =
-      TextEditingController();
-  final TextEditingController _customersLastNameController =
-      TextEditingController();
-  final TextEditingController _customersAddressController =
-      TextEditingController();
-  final TextEditingController _customersBirthdayController =
-      TextEditingController();
+  final TextEditingController _customersFirstNameController = TextEditingController();
+  final TextEditingController _customersLastNameController = TextEditingController();
+  final TextEditingController _customersAddressController = TextEditingController();
+  final TextEditingController _customersBirthdayController = TextEditingController();
   var controllers = <TextEditingController>[];
   var names = <String>[];
   EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
@@ -42,13 +37,12 @@ class CustomerListPageState extends State<CustomerListPage> {
     });
   }
 
-bool landscape(){
-  var size = MediaQuery.of(context).size;
-  var height = size.height;
-  var width = size.width;
-    return(width>height) && (width > 720);
-}
-
+  bool landscape() {
+    var size = MediaQuery.of(context).size;
+    var height = size.height;
+    var width = size.width;
+    return (width > height) && (width > 720);
+  }
 
   Future<void> displayPrevious() async {
     for (var i = 0; i < controllers.length; i++) {
@@ -94,8 +88,7 @@ bool landscape(){
     });
   }
 
-  Future<void> add(String firstName, String lastName, String address,
-      String birthday) async {
+  Future<void> add(String firstName, String lastName, String address, String birthday) async {
     int id = await checkId();
 
     final customer = Customer(id, firstName, lastName, address, birthday);
@@ -159,7 +152,6 @@ bool landscape(){
               ),
             ),
             const SizedBox(height: 16),
-            // Add some spacing between the title and content
             Row(
               children: [
                 const Expanded(
@@ -207,6 +199,68 @@ bool landscape(){
     );
   }
 
+  void displayHelp() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text.rich(
+                TextSpan(
+                  text: 'Customer List Help',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple, // Highlight color
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Table(
+              columnWidths: const {
+                0: FixedColumnWidth(30.0), // Fixed width for the first column
+                1: FlexColumnWidth(), // Flexible width for the second column
+              },
+              children: const [
+                TableRow(children: [
+                  Text('+', style: TextStyle(fontSize: 15)),
+                  Text('Add New Customer', style: TextStyle(fontSize: 12)),
+                ]),
+                TableRow(children: [
+                  Icon(Icons.clear),
+                  Text('Clear Customer Information', style: TextStyle(fontSize: 12)),
+                ]),
+                TableRow(children: [
+                  Icon(Icons.arrow_back),
+                  Text('Previous Customer Information', style: TextStyle(fontSize: 12)),
+                ]),
+                TableRow(children: [
+                  Icon(Icons.check_box),
+                  Text('Update Customer', style: TextStyle(fontSize: 12)),
+                ]),
+                TableRow(children: [
+                  Text('-', style: TextStyle(fontSize: 15)),
+                  Text('Delete Customer', style: TextStyle(fontSize: 12)),
+                ]),
+              ],
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('Ok'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -218,10 +272,7 @@ bool landscape(){
     ];
     names = <String>["FirstName", "LastName", "Address", "Birthday"];
 
-    $FloorCustomerDatabase
-        .databaseBuilder('app_database.db')
-        .build()
-        .then((database) async {
+    $FloorCustomerDatabase.databaseBuilder('app_database.db').build().then((database) async {
       myDAO = database.customerDao;
 
       myDAO.getAllCustomers().then((listOfCustomers) {
@@ -240,36 +291,33 @@ bool landscape(){
     _customersBirthdayController.dispose();
     super.dispose();
   }
-  Widget list(){
-    return
-      Expanded(
-        child: ListView.builder(
-          itemCount: customers.length,
-          itemBuilder: (context, index) {
-            final customer = customers[index];
-            return GestureDetector(
-              child: ListTile(
-                leading: updated && customer.id == updateId
-                    ? const Icon(Icons.star)
-                    : const Icon(Icons.flutter_dash),
-                title: Text('${customer.firstName} ${customer.lastName}'),
-                // subtitle: Text('Address: ${customer.address}\nBirthday: ${customer.birthday}'),
-              ),
-              onTap: () {
-                setState(() {
-                  updated = true;
-                  updateId = customer.id;
-                  update1(customer);
-                  // displayAlert(customer);
-                });
-              },
-            );
+
+  Widget list() {
+    return ListView.builder(
+      itemCount: customers.length,
+      itemBuilder: (context, index) {
+        final customer = customers[index];
+        return GestureDetector(
+          child: ListTile(
+            leading: updated && customer.id == updateId
+                ? const Icon(Icons.star)
+                : const Icon(Icons.flutter_dash),
+            title: Text('${customer.firstName} ${customer.lastName}'),
+          ),
+          onTap: () {
+            setState(() {
+              updated = true;
+              updateId = customer.id;
+              update1(customer);
+            });
           },
-        ),
-      );
+        );
+      },
+    );
   }
-  List<Widget> details(){
-    return [
+
+  Widget details(bool helpB) {
+    return Column(children: [
       Row(
         children: [
           Expanded(
@@ -337,16 +385,19 @@ bool landscape(){
           ),
         ],
       ),
-    ];
+      buttons(helpB),
+    ]);
   }
-Widget buttons (){
-    return
-  Wrap(
-      spacing: 8.0, // gap between adjacent buttons
-      runSpacing: 4.0, // gap between lines
+
+  Widget buttons(bool helpB) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ElevatedButton(
-          child: const Text('Add'),
+          child: const Text(
+            '+',
+            style: TextStyle(fontSize: 25),
+          ),
           onPressed: () {
             bool correct = true;
 
@@ -372,19 +423,21 @@ Widget buttons (){
           },
         ),
         ElevatedButton(
-            child: const Text('Clear'),
-            onPressed: () {
-              clearAll();
-            }),
+          child: const Icon(Icons.clear),
+          onPressed: () {
+            clearAll();
+          },
+        ),
         if (previous)
           ElevatedButton(
-              child: const Text('Previous'),
-              onPressed: () {
-                displayPrevious();
-              }),
+            child: const Icon(Icons.arrow_back),
+            onPressed: () {
+              displayPrevious();
+            },
+          ),
         if (updated) ...[
           ElevatedButton(
-            child: const Text('Update'),
+            child: const Icon(Icons.check_box),
             onPressed: () {
               bool correct = true;
               var values = <String>[];
@@ -407,14 +460,40 @@ Widget buttons (){
             },
           ),
           ElevatedButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                displayAlert(selected!);
-                // delete(updateId);
-              }),
-        ]
-      ]);
-}
+            child: const Text(
+              '-',
+              style: TextStyle(fontSize: 25),
+            ),
+            onPressed: () {
+              displayAlert(selected!);
+            },
+          ),
+
+        ],
+        if (helpB)
+          helpButton(),
+      ],
+    );
+  }
+
+  Widget helpButton() {
+    return ElevatedButton(
+      child: const Icon(Icons.info),
+      onPressed: () {
+        displayHelp();
+      },
+    );
+  }
+
+  Widget helpButtonRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        helpButton(),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -422,23 +501,37 @@ Widget buttons (){
         title: const Text('Customer List'),
       ),
       body: Center(
-        child: landscape()?
-         Row(
-            children: [
-              list(),
-
-            ]
-         )
-
-       : Column(
-
-          children: <Widget>[
-            ...details(),
-            buttons(),
-            const SizedBox(height: 20),
-            list(),
+        child: landscape()
+            ? Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Container(
+                child: list(),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                child: details(true),
+              ),
+            ),
           ],
         )
+            : Column(
+          children: <Widget>[
+            Container(
+              child: details(false),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Container(
+                child: list(),
+              ),
+            ),
+            helpButtonRow(),
+          ],
+        ),
       ),
     );
   }
