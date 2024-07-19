@@ -42,6 +42,14 @@ class CustomerListPageState extends State<CustomerListPage> {
     });
   }
 
+bool landscape(){
+  var size = MediaQuery.of(context).size;
+  var height = size.height;
+  var width = size.width;
+    return(width>height) && (width > 720);
+}
+
+
   Future<void> displayPrevious() async {
     for (var i = 0; i < controllers.length; i++) {
       controllers[i].text = await prefs.getString(names[i]);
@@ -232,7 +240,181 @@ class CustomerListPageState extends State<CustomerListPage> {
     _customersBirthdayController.dispose();
     super.dispose();
   }
+  Widget list(){
+    return
+      Expanded(
+        child: ListView.builder(
+          itemCount: customers.length,
+          itemBuilder: (context, index) {
+            final customer = customers[index];
+            return GestureDetector(
+              child: ListTile(
+                leading: updated && customer.id == updateId
+                    ? const Icon(Icons.star)
+                    : const Icon(Icons.flutter_dash),
+                title: Text('${customer.firstName} ${customer.lastName}'),
+                // subtitle: Text('Address: ${customer.address}\nBirthday: ${customer.birthday}'),
+              ),
+              onTap: () {
+                setState(() {
+                  updated = true;
+                  updateId = customer.id;
+                  update1(customer);
+                  // displayAlert(customer);
+                });
+              },
+            );
+          },
+        ),
+      );
+  }
+  List<Widget> details(){
+    return [
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _customersFirstNameController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Add First Name',
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _customersLastNameController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Add Last Name',
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _customersBirthdayController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Add Birthdate',
+              ),
+              onTap: () async {
+                DateTime? date = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime(2000),
+                  firstDate: DateTime(1967),
+                  lastDate: DateTime.now(),
+                );
+                if (date != null) {
+                  _customersBirthdayController.text =
+                  '${date.month}-${date.day}-${date.year}';
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _customersAddressController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Add Address',
+              ),
+            ),
+          ),
+        ],
+      ),
+    ];
+  }
+Widget buttons (){
+    return
+  Wrap(
+      spacing: 8.0, // gap between adjacent buttons
+      runSpacing: 4.0, // gap between lines
+      children: [
+        ElevatedButton(
+          child: const Text('Add'),
+          onPressed: () {
+            bool correct = true;
 
+            var values = <String>[];
+            for (var i = 0; i < controllers.length; i++) {
+              final value = controllers[i].value.text;
+              if (value == "") {
+                correct = false;
+                break;
+              }
+
+              values.add(value);
+            }
+            if (correct) {
+              for (var i = 0; i < controllers.length; i++) {
+                prefs.setString(names[i], values[i]);
+              }
+
+              add(values[0], values[1], values[2], values[3]);
+            } else {
+              emptyInputSnackBar();
+            }
+          },
+        ),
+        ElevatedButton(
+            child: const Text('Clear'),
+            onPressed: () {
+              clearAll();
+            }),
+        if (previous)
+          ElevatedButton(
+              child: const Text('Previous'),
+              onPressed: () {
+                displayPrevious();
+              }),
+        if (updated) ...[
+          ElevatedButton(
+            child: const Text('Update'),
+            onPressed: () {
+              bool correct = true;
+              var values = <String>[];
+              for (var i = 0; i < controllers.length; i++) {
+                final value = controllers[i].value.text;
+                if (value == "") {
+                  correct = false;
+                  break;
+                }
+
+                values.add(value);
+              }
+              if (correct) {
+                final updatedCustomer = Customer(
+                    updateId, values[0], values[1], values[2], values[3]);
+                update2(updatedCustomer);
+              } else {
+                emptyInputSnackBar();
+              }
+            },
+          ),
+          ElevatedButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                displayAlert(selected!);
+                // delete(updateId);
+              }),
+        ]
+      ]);
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,173 +422,23 @@ class CustomerListPageState extends State<CustomerListPage> {
         title: const Text('Customer List'),
       ),
       body: Center(
-        child: Column(
+        child: landscape()?
+         Row(
+            children: [
+              list(),
+
+            ]
+         )
+
+       : Column(
+
           children: <Widget>[
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _customersFirstNameController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Add First Name',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _customersLastNameController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Add Last Name',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _customersBirthdayController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Add Birthdate',
-                    ),
-                    onTap: () async {
-                      DateTime? date = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime(2000),
-                        firstDate: DateTime(1967),
-                        lastDate: DateTime.now(),
-                      );
-                      if (date != null) {
-                        _customersBirthdayController.text =
-                            '${date.month}-${date.day}-${date.year}';
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _customersAddressController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Add Address',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(children: [
-              ElevatedButton(
-                child: const Text('Add'),
-                onPressed: () {
-                  bool correct = true;
-
-                  var values = <String>[];
-                  for (var i = 0; i < controllers.length; i++) {
-                    final value = controllers[i].value.text;
-                    if (value == "") {
-                      correct = false;
-                      break;
-                    }
-
-                    values.add(value);
-                  }
-                  if (correct) {
-                    for (var i = 0; i < controllers.length; i++) {
-                      prefs.setString(names[i], values[i]);
-                    }
-
-                    add(values[0], values[1], values[2], values[3]);
-                  } else {
-                    emptyInputSnackBar();
-                  }
-                },
-              ),
-              ElevatedButton(
-                  child: const Text('Clear'),
-                  onPressed: () {
-                    clearAll();
-                  }),
-              if (previous)
-                ElevatedButton(
-                    child: const Text('Previous'),
-                    onPressed: () {
-                      displayPrevious();
-                    }),
-              if (updated) ...[
-                ElevatedButton(
-                  child: const Text('Update'),
-                  onPressed: () {
-                    bool correct = true;
-                    var values = <String>[];
-                    for (var i = 0; i < controllers.length; i++) {
-                      final value = controllers[i].value.text;
-                      if (value == "") {
-                        correct = false;
-                        break;
-                      }
-
-                      values.add(value);
-                    }
-                    if (correct) {
-                      final updatedCustomer = Customer(
-                          updateId, values[0], values[1], values[2], values[3]);
-                      update2(updatedCustomer);
-                    } else {
-                      emptyInputSnackBar();
-                    }
-                  },
-                ),
-                ElevatedButton(
-                    child: const Text('Delete'),
-                    onPressed: () {
-                      displayAlert(selected!);
-                      // delete(updateId);
-                    }),
-              ]
-            ]),
+            ...details(),
+            buttons(),
             const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: customers.length,
-                itemBuilder: (context, index) {
-                  final customer = customers[index];
-                  return GestureDetector(
-                    child: ListTile(
-                      leading: updated && customer.id == updateId
-                          ? const Icon(Icons.star)
-                          : const Icon(Icons.flutter_dash),
-                      title: Text('${customer.firstName} ${customer.lastName}'),
-                      // subtitle: Text('Address: ${customer.address}\nBirthday: ${customer.birthday}'),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        updated = true;
-                        updateId = customer.id;
-                        update1(customer);
-                        // displayAlert(customer);
-                      });
-                    },
-                  );
-                },
-              ),
-            ),
+            list(),
           ],
-        ),
+        )
       ),
     );
   }
