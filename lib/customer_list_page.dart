@@ -1,7 +1,9 @@
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
+import 'package:final_project/AppLocalizations.dart';
 import 'package:final_project/customer_dao.dart';
 import 'package:final_project/customer_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'dart:math';
 import 'customer.dart';
 
@@ -15,11 +17,21 @@ class CustomerListPage extends StatefulWidget {
 }
 
 class CustomerListPageState extends State<CustomerListPage> {
+  final englishLocale = const Locale("en", "CA");
+  final frenchLocale = const Locale("fr", "FR");
+  late Locale _locale;
+
+
+
   var customers = <Customer>[];
-  final TextEditingController _customersFirstNameController = TextEditingController();
-  final TextEditingController _customersLastNameController = TextEditingController();
-  final TextEditingController _customersAddressController = TextEditingController();
-  final TextEditingController _customersBirthdayController = TextEditingController();
+  final TextEditingController _customersFirstNameController =
+      TextEditingController();
+  final TextEditingController _customersLastNameController =
+      TextEditingController();
+  final TextEditingController _customersAddressController =
+      TextEditingController();
+  final TextEditingController _customersBirthdayController =
+      TextEditingController();
   var controllers = <TextEditingController>[];
   var names = <String>[];
   EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
@@ -27,6 +39,12 @@ class CustomerListPageState extends State<CustomerListPage> {
   bool updated = false;
   int updateId = 0;
   Customer? selected;
+
+  void changeLanguage(Locale newLocale) {
+    setState(() {
+      _locale = newLocale;
+    });
+  }
 
   void clearAll() {
     for (var controller in controllers) {
@@ -42,6 +60,10 @@ class CustomerListPageState extends State<CustomerListPage> {
     var height = size.height;
     var width = size.width;
     return (width > height) && (width > 720);
+  }
+
+  String translate(String word){
+    return AppLocalizations.of(context)?.translate(word)??'Hello';
   }
 
   Future<void> displayPrevious() async {
@@ -88,7 +110,8 @@ class CustomerListPageState extends State<CustomerListPage> {
     });
   }
 
-  Future<void> add(String firstName, String lastName, String address, String birthday) async {
+  Future<void> add(String firstName, String lastName, String address,
+      String birthday) async {
     int id = await checkId();
 
     final customer = Customer(id, firstName, lastName, address, birthday);
@@ -221,8 +244,10 @@ class CustomerListPageState extends State<CustomerListPage> {
             const SizedBox(height: 16),
             Table(
               columnWidths: const {
-                0: FixedColumnWidth(30.0), // Fixed width for the first column
-                1: FlexColumnWidth(), // Flexible width for the second column
+                0: FixedColumnWidth(30.0),
+                // Fixed width for the first column
+                1: FlexColumnWidth(),
+                // Flexible width for the second column
               },
               children: const [
                 TableRow(children: [
@@ -231,11 +256,13 @@ class CustomerListPageState extends State<CustomerListPage> {
                 ]),
                 TableRow(children: [
                   Icon(Icons.clear),
-                  Text('Clear Customer Information', style: TextStyle(fontSize: 12)),
+                  Text('Clear Customer Information',
+                      style: TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
                   Icon(Icons.arrow_back),
-                  Text('Previous Customer Information', style: TextStyle(fontSize: 12)),
+                  Text('Previous Customer Information',
+                      style: TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
                   Icon(Icons.check_box),
@@ -260,10 +287,59 @@ class CustomerListPageState extends State<CustomerListPage> {
       ),
     );
   }
+  void showChangeLanguage() {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text.rich(
+                TextSpan(
+                  text: 'Change Language',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple, // Highlight color
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+
+          ],
+        ),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('English'),
+            onPressed: () {
+              changeLanguage(englishLocale);
+              Navigator.pop(context);
+            },
+          ),
+          ElevatedButton(
+            child: const Text('French'),
+            onPressed: () {
+              changeLanguage(frenchLocale);
+              Navigator.pop(context);
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void initState() {
     super.initState();
+    _locale = englishLocale;
     controllers = <TextEditingController>[
       _customersFirstNameController,
       _customersLastNameController,
@@ -272,7 +348,10 @@ class CustomerListPageState extends State<CustomerListPage> {
     ];
     names = <String>["FirstName", "LastName", "Address", "Birthday"];
 
-    $FloorCustomerDatabase.databaseBuilder('app_database.db').build().then((database) async {
+    $FloorCustomerDatabase
+        .databaseBuilder('app_database.db')
+        .build()
+        .then((database) async {
       myDAO = database.customerDao;
 
       myDAO.getAllCustomers().then((listOfCustomers) {
@@ -323,9 +402,9 @@ class CustomerListPageState extends State<CustomerListPage> {
           Expanded(
             child: TextField(
               controller: _customersFirstNameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Add First Name',
+              decoration:  InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: translate('firstName'),
               ),
             ),
           ),
@@ -364,7 +443,7 @@ class CustomerListPageState extends State<CustomerListPage> {
                 );
                 if (date != null) {
                   _customersBirthdayController.text =
-                  '${date.month}-${date.day}-${date.year}';
+                      '${date.month}-${date.day}-${date.year}';
                 }
               },
             ),
@@ -468,10 +547,8 @@ class CustomerListPageState extends State<CustomerListPage> {
               displayAlert(selected!);
             },
           ),
-
         ],
-        if (helpB)
-          helpButton(),
+        if (helpB) helpButton(),
       ],
     );
   }
@@ -496,43 +573,65 @@ class CustomerListPageState extends State<CustomerListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Customer List'),
-      ),
-      body: Center(
-        child: landscape()
-            ? Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Container(
-                child: list(),
+    return MaterialApp(
+        supportedLocales: [ frenchLocale, englishLocale ],
+
+        localizationsDelegates: const[
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate
+
+        ],
+       locale:_locale,
+        title: 'Hello',
+
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text('Customer List'),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.help_outline),
+                onPressed: () {
+                  showChangeLanguage();
+                },
               ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                child: details(true),
-              ),
-            ),
-          ],
-        )
-            : Column(
-          children: <Widget>[
-            Container(
-              child: details(false),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Container(
-                child: list(),
-              ),
-            ),
-            helpButtonRow(),
-          ],
-        ),
-      ),
-    );
+            ],
+          ),
+
+          body: Center(
+            child: landscape()
+                ? Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: list(),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: details(true),
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: <Widget>[
+                      Container(
+                        child: details(false),
+                      ),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: Container(
+                          child: list(),
+                        ),
+                      ),
+                      helpButtonRow(),
+                    ],
+                  ),
+          ),
+        ));
   }
 }
