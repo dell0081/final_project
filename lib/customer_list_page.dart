@@ -37,6 +37,9 @@ class CustomerListPageState extends State<CustomerListPage> {
   Customer? selected;
 
   void changeLanguage(Locale newLocale) {
+    setState(() {
+      _locale = newLocale;
+    });
     widget.onLocaleChange(newLocale);
   }
 
@@ -238,9 +241,7 @@ class CustomerListPageState extends State<CustomerListPage> {
             Table(
               columnWidths: const {
                 0: FixedColumnWidth(30.0),
-                // Fixed width for the first column
                 1: FlexColumnWidth(),
-                // Flexible width for the second column
               },
               children: [
                 TableRow(children: [
@@ -546,7 +547,7 @@ class CustomerListPageState extends State<CustomerListPage> {
 
   Widget helpButton() {
     return ElevatedButton(
-      child: const Icon(Icons.info),
+      child: const Icon(Icons.help),
       onPressed: () {
         displayHelp();
       },
@@ -561,13 +562,15 @@ class CustomerListPageState extends State<CustomerListPage> {
       ],
     );
   }
-Widget customerPage(){
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)?.translate('title') ?? 'Customer List'),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.help_outline),
+            icon: const Icon(Icons.language),
             onPressed: () {
               showChangeLanguage();
             },
@@ -608,10 +611,28 @@ Widget customerPage(){
         ),
       ),
     );
+  }
 }
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale _locale = const Locale('en', 'CA');
+
+  void _setLocale(Locale newLocale) {
+    setState(() {
+      _locale = newLocale;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return MaterialApp(
       supportedLocales: const [
         Locale('en', 'CA'),
         Locale('fr', 'FR'),
@@ -622,16 +643,10 @@ Widget customerPage(){
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      locale:_locale,
-      home: customerPage(),
-
+      locale: _locale,
+      home: CustomerListPage(
+        onLocaleChange: _setLocale,
+      ),
     );
   }
 }
-
-
-
-
-
-
-
