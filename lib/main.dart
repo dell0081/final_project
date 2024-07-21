@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'AppLocalizations.dart';
+import 'app_localizations.dart';
 import 'customer_list_page.dart';
 import 'airplane_list_page.dart';
 import 'flights_list_page.dart';
@@ -9,12 +9,11 @@ import 'reservation_page.dart';
 void main() {
   runApp(const MyApp());
 }
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -58,7 +57,7 @@ class MyHomePage extends StatelessWidget {
   final String title;
   final void Function(Locale locale) onLocaleChange;
 
-  MyHomePage({super.key, required this.title, required this.onLocaleChange});
+  const MyHomePage({super.key, required this.title, required this.onLocaleChange});
 
   @override
   Widget build(BuildContext context) {
@@ -168,3 +167,6 @@ class MyHomePage extends StatelessWidget {
     );
   }
 }
+
+
+

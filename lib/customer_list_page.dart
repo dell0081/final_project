@@ -1,9 +1,9 @@
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
-import 'package:final_project/AppLocalizations.dart';
+import 'package:final_project/app_localizations.dart';
 import 'package:final_project/customer_dao.dart';
 import 'package:final_project/customer_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'dart:math';
 import 'customer.dart';
 
@@ -21,7 +21,7 @@ class CustomerListPage extends StatefulWidget {
 class CustomerListPageState extends State<CustomerListPage> {
   final Locale englishLocale = const Locale("en", "CA");
   final Locale frenchLocale = const Locale("fr", "FR");
-  late Locale _locale;
+
 
   var customers = <Customer>[];
   final TextEditingController _customersFirstNameController = TextEditingController();
@@ -37,9 +37,9 @@ class CustomerListPageState extends State<CustomerListPage> {
   Customer? selected;
 
   void changeLanguage(Locale newLocale) {
-    setState(() {
-      _locale = newLocale;
-    });
+    // setState(() {
+    //   _locale = newLocale;
+    // });
     widget.onLocaleChange(newLocale);
   }
 
@@ -331,7 +331,7 @@ class CustomerListPageState extends State<CustomerListPage> {
   @override
   void initState() {
     super.initState();
-    _locale = englishLocale;
+    //_locale = englishLocale;
     controllers = <TextEditingController>[
       _customersFirstNameController,
       _customersLastNameController,
@@ -609,43 +609,6 @@ class CustomerListPageState extends State<CustomerListPage> {
             helpButtonRow(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Locale _locale = const Locale('en', 'CA');
-
-  void _setLocale(Locale newLocale) {
-    setState(() {
-      _locale = newLocale;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      supportedLocales: const [
-        Locale('en', 'CA'),
-        Locale('fr', 'FR'),
-      ],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      locale: _locale,
-      home: CustomerListPage(
-        onLocaleChange: _setLocale,
       ),
     );
   }
