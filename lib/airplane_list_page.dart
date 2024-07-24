@@ -3,25 +3,43 @@ import 'package:final_project/AirplaneDB.dart';
 import 'package:flutter/material.dart';
 import 'Airplane.dart';
 import 'AirplaneDAO.dart';
+import 'AppLocalizations.dart';
 
-///creates the AirplineListPage
+///creates the AirplaneListPage
 class AirplaneListPage extends StatefulWidget {
   const AirplaneListPage({super.key});
+
   @override
   State<StatefulWidget> createState() => AirplaneListPageCreate();
 }
 
 ///builds the page
 class AirplaneListPageCreate extends State<AirplaneListPage> {
-
   ///selected airplane from the list that the user wants displayed
   Airplane? selected;
+
   ///list of Airplane objects, reflects what is stored in the database
   late List<Airplane> airplanes = [];
+
   ///controller for the textbox that tracks user input
   late TextEditingController input;
+
   ///data access object for airplane table
   late AirplaneDAO dao;
+
+  ///english canadian locale
+  var english = Locale('en', 'CA');
+
+  ///french standard locale
+  var french = Locale('fr', 'FR');
+
+  ///locale for switching languages
+  late var locale;
+
+  ///translates string
+  String translate(String s) {
+    return AppLocalizations.of(context)?.translate(s) ?? 'error';
+  }
 
   ///sets initial state of page
   ///
@@ -45,7 +63,9 @@ class AirplaneListPageCreate extends State<AirplaneListPage> {
 
   ///creates database and initializes dao object
   Future<void> createDB() async {
-    final database = await $FloorAirplaneDatabase.databaseBuilder('Airplane_Database.db').build();
+    final database = await $FloorAirplaneDatabase
+        .databaseBuilder('Airplane_Database.db')
+        .build();
     dao = database.airplaneDAO;
     load();
   }
@@ -102,82 +122,103 @@ class AirplaneListPageCreate extends State<AirplaneListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Airplane List'),
+        title: Text(translate('pageTitle')),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          const Text('This is the Airplane List Page'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Flexible(
-                child: TextField(
-                  controller: input,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Enter an Airplane",
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Text(translate('title'),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Flexible(
+                  child: TextField(
+                    controller: input,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      labelText: translate('textHeading'),
+                    ),
                   ),
                 ),
-              ),
-              ElevatedButton(
-                child: const Text('Add'),
-                onPressed: () {
-                  EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
-                  prefs.setString('input', input.value.text);
-                  List<String> values = input.text.split('_');
-                  try {
-                    String name = values[0];
-                    int passengers = int.parse(values[1]);
-                    double speed = double.parse(values[2]);
-                    double distance = double.parse(values[3]);
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                  ),
+                  child: Text(translate('add')),
+                  onPressed: () {
+                    EncryptedSharedPreferences prefs =
+                        EncryptedSharedPreferences();
+                    prefs.setString('input', input.value.text);
+                    List<String> values = input.text.split('_');
+                    try {
+                      String name = values[0];
+                      int passengers = int.parse(values[1]);
+                      double speed = double.parse(values[2]);
+                      double distance = double.parse(values[3]);
 
-                    add(name, passengers, speed, distance);
-                  }
-                  catch (e) {
-                    invalidInputSnackBar();
-                  }
-                },
+                      add(name, passengers, speed, distance);
+                    } catch (e) {
+                      invalidInputSnackBar();
+                    }
+                  },
+                ),
+              ],
+            ),
+            Expanded(child: display()),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               ),
-            ],
-          ),
-          Expanded(child: display()),
-          ElevatedButton(
-            child: const Icon(Icons.description),
-            onPressed: () {
-              showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) =>
-                      AlertDialog(
-                        content: const Column(
-                            mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Align(alignment:Alignment.centerLeft, child:Text('Enter information into the database through the format "[plane-name]_[passenger-maximum]_[maximum-speed]_[maximum-distance]" ex. (boeing 737_200_0.78_7.084).')),
-                            Align(alignment:Alignment.centerLeft, child:Text('Where [plane-name] is valid string, [passenger-maximum] is a valid integer, and [maximum-speed] & [maximum-distance] are both valid doubles. Do not enter the [ or ].')),
-                            Align(alignment:Alignment.centerLeft, child:Text('Speed is measured in Mach levels, and distance is represented in 1000km. Ex. (boeing 737_200_0.78_7.084) 0.78 = mach 0.78, 7.084 = 7084km.')),
-                          ]
-                        ),
-                        actions: <Widget>[
-                          ElevatedButton(
-                            child: const Text('close'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      )
-              );
-            },
-          ),
-        ],
-      ),
+              child: const Icon(Icons.description),
+              onPressed: () {
+                showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(translate('instructions')),
+                                const SizedBox(height: 10),
+                                Text(translate('instructions2')),
+                                const SizedBox(height: 10),
+                                Text(translate('instructions3')),
+                              ]),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              child: Text(translate('close')),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ));
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
+
   ///snackbar to warn user of invalid input
   void invalidInputSnackBar() {
-    var snackBar = SnackBar( content: const Text('Invalid Input! Check Instructions.'), action:SnackBarAction(label: 'hide', onPressed: () { ScaffoldMessenger.of(context).hideCurrentSnackBar(); } ));
+    var snackBar = SnackBar(
+      content: Text(translate('snackbar')),
+      action: SnackBarAction(
+        label: translate('Hide'),
+        onPressed: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -190,7 +231,7 @@ class AirplaneListPageCreate extends State<AirplaneListPage> {
     if ((width > height) && (width > 720)) {
       return Row(
         children: [
-          Expanded(flex: 1,child: listAirplanes()),
+          Expanded(flex: 1, child: listAirplanes()),
           Expanded(flex: 2, child: listAirplaneDetails()),
         ],
       );
@@ -210,11 +251,21 @@ class AirplaneListPageCreate extends State<AirplaneListPage> {
       itemBuilder: (context, index) {
         final temp = airplanes[index];
         return GestureDetector(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-                Text(temp.name),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(temp.name, style: const TextStyle(fontSize: 18)),
+                ],
+              ),
+            ),
           ),
           onTap: () {
             setState(() {
@@ -230,66 +281,60 @@ class AirplaneListPageCreate extends State<AirplaneListPage> {
   ///
   /// based on currently selected airplane, displays all values and allows for deletion
   Widget listAirplaneDetails() {
-
-    if(selected != null) {
-      return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Airplane Details', style: TextStyle(fontSize: 30.0)),
-                  Text('Name: ${selected!.name}', style: const TextStyle(fontSize: 20.0)),
-                  Text('Passengers: ${selected!.passengers}', style: const TextStyle(fontSize: 20.0)),
-                  Text('Speed: ${selected!.speed}', style: const TextStyle(fontSize: 20.0)),
-                  Text('Distance: ${selected!.distance}', style: const TextStyle(fontSize: 20.0)),
-                ]
-            ),
-            ElevatedButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                showDialog<String>(
-                    context: context,
-                    builder: (BuildContext context) =>
-                        AlertDialog(
-                          content: const Text('Are you sure you want to delete this plane?'),
-                          actions: <Widget>[
-                            ElevatedButton(
-                              child: const Text('Yes'),
-                              onPressed: () {
-                                setState(() {
-                                  delete(selected!.id);
-                                  setState(() {
-                                    selected = null;
-                                    load();
-                                  });
-                                });
-                                Navigator.pop(context);
-                              },
-                            ),
-                            ElevatedButton(
-                              child: const Text('No'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        )
-                );
-              },
-            ),
-            ElevatedButton(
-              child: const Text('Clear'),
-              onPressed: () {
-                setState(() {
-                  selected = null;
-                });
-              },
-            ),
-          ]
-      );
-    }
-    else {
+    if (selected != null) {
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text(translate('details'), style: const TextStyle(fontSize: 30.0)),
+          Text('${translate('name')}${selected!.name}',
+              style: const TextStyle(fontSize: 20.0)),
+          Text('${translate('passengers')}${selected!.passengers}',
+              style: const TextStyle(fontSize: 20.0)),
+          Text('${translate('speed')}${selected!.speed}',
+              style: const TextStyle(fontSize: 20.0)),
+          Text('${translate('distance')}${selected!.distance}',
+              style: const TextStyle(fontSize: 20.0)),
+        ]),
+        ElevatedButton(
+          child: Text(translate('delete')),
+          onPressed: () {
+            showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                      content: Text(translate('delMessage')),
+                      actions: <Widget>[
+                        ElevatedButton(
+                          child: Text(translate('yes')),
+                          onPressed: () {
+                            setState(() {
+                              delete(selected!.id);
+                              setState(() {
+                                selected = null;
+                                load();
+                              });
+                            });
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ElevatedButton(
+                          child: Text(translate('no')),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ));
+          },
+        ),
+        ElevatedButton(
+          child: Text(translate('clear')),
+          onPressed: () {
+            setState(() {
+              selected = null;
+            });
+          },
+        ),
+      ]);
+    } else {
       return Container();
     }
   }

@@ -1,34 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'customer_list_page.dart';
 import 'airplane_list_page.dart';
 import 'flights_list_page.dart';
 import 'reservation_page.dart';
+import 'AppLocalizations.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  MyAppState createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  Locale locale = const Locale('en', 'CA');
+
+  void changeLanguage(Locale newLocale) {
+    setState(() {
+      locale = newLocale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      supportedLocales: const [Locale('fr', 'FR'), Locale('en', 'CA')],
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Main Page'),
+      home: MyHomePage(
+        title: 'Main Page',
+        changeLanguage: changeLanguage,
+      ),
     );
   }
 }
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage(
+      {super.key, required this.title, required this.changeLanguage});
 
   final String title;
+  final Function(Locale) changeLanguage;
 
   @override
   Widget build(BuildContext context) {
@@ -47,16 +75,17 @@ class MyHomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => CustomerListPage()),
                 );
               },
-              child: Text('Go to Customer List Page'),
+              child: const Text('Go to Customer List Page'),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AirplaneListPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const AirplaneListPage()),
                 );
               },
-              child: Text('Go to Airplane List Page'),
+              child: const Text('Go to Airplane List Page'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -74,7 +103,19 @@ class MyHomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => ReservationPage()),
                 );
               },
-              child: Text('Go to Reservation Page'),
+              child: const Text('Go to Reservation Page'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                changeLanguage(const Locale('en', 'CA'));
+              },
+              child: const Text('English'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                changeLanguage(const Locale('fr', 'FR'));
+              },
+              child: const Text('French'),
             ),
           ],
         ),
