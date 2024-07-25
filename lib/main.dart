@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'customer_list_page.dart';
 import 'airplane_list_page.dart';
 import 'flights_list_page.dart';
 import 'reservation_page.dart';
+import "package:flutter_gen/gen_l10n/app_localizations.dart";
 
 void main() {
   runApp(const MyApp());
@@ -16,6 +18,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate
+      ],
+  supportedLocales: [
+    Locale("en"),
+    Locale("fr")
+  ],
+      locale: Locale('fr'),
+
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
