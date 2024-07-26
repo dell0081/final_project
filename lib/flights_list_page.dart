@@ -4,7 +4,7 @@ import 'database.dart';
 import 'flight_dao.dart';
 import 'flight_details_page.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'AppLocalizations.dart';
 
 /// A page that displays a list of flights and allows for adding, updating, and deleting flights.
 ///
@@ -34,8 +34,10 @@ class _FlightsListPageState extends State<FlightsListPage> {
   @override
   void initState() {
     super.initState();
-    _setupDatabase();
-    _loadSavedData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setupDatabase();
+      _loadSavedData();
+    });
   }
 
   /// Sets up the database by building and getting the [FlightDao].
@@ -65,7 +67,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
       _clearInputFields();
       _showFlightDetails(newFlight);
     } else {
-      _showErrorDialog(AppLocalizations.of(context)!.all_fields_required);
+      _showErrorDialog(AppLocalizations.of(context)?.translate('all_fields_required') ?? 'All fields are required');
     }
   }
 
@@ -156,7 +158,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.error),
+        title: Text(AppLocalizations.of(context)?.translate('error') ?? 'Error'),
         content: Text(message),
         actions: [
           TextButton(
@@ -172,7 +174,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.go_to_flights_list_page),
+        title: Text(AppLocalizations.of(context)?.translate('go_to_flights_list_page') ?? 'Flights List Page'),
         actions: [
           IconButton(
             icon: Icon(Icons.language),
@@ -188,15 +190,15 @@ class _FlightsListPageState extends State<FlightsListPage> {
               children: [
                 TextField(
                   controller: _departureCityController,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.departure_city),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('departure_city') ?? 'Departure City'),
                 ),
                 TextField(
                   controller: _destinationCityController,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.destination_city),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('destination_city') ?? 'Destination City'),
                 ),
                 TextField(
                   controller: _departureTimeController,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.departure_time),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('departure_time') ?? 'Departure Time'),
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
@@ -209,7 +211,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
                 ),
                 TextField(
                   controller: _arrivalTimeController,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.arrival_time),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('arrival_time') ?? 'Arrival Time'),
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
@@ -222,7 +224,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
                 ),
                 ElevatedButton(
                   onPressed: _addFlight,
-                  child: Text(AppLocalizations.of(context)!.add_flight),
+                  child: Text(AppLocalizations.of(context)?.translate('add_flight') ?? 'Add Flight'),
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -231,7 +233,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
                       final flight = _flights[index];
                       return ListTile(
                         title: Text('${flight.departureCity} to ${flight.destinationCity}'),
-                        subtitle: Text('${AppLocalizations.of(context)!.departure}: ${flight.departureTime}, ${AppLocalizations.of(context)!.arrival}: ${flight.arrivalTime}'),
+                        subtitle: Text('${AppLocalizations.of(context)?.translate('departure') ?? 'Departure'}: ${flight.departureTime}, ${AppLocalizations.of(context)?.translate('arrival') ?? 'Arrival'}: ${flight.arrivalTime}'),
                         onTap: () {
                           _showFlightDetails(flight);
                         },
@@ -264,7 +266,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
                 },
                 onLocaleToggle: widget.onLocaleToggle, // Pass the onLocaleToggle function
               )
-                  : Center(child: Text(AppLocalizations.of(context)!.use_interface)),
+                  : Center(child: Text(AppLocalizations.of(context)?.translate('use_interface') ?? 'Use Interface')),
             ),
         ],
       ),

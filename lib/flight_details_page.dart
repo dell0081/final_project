@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'AppLocalizations.dart';
 import 'flight.dart';
 import 'database.dart';
 import 'flight_dao.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// A page that displays the details of a flight and allows for updating or deleting the flight.
 ///
@@ -75,14 +75,14 @@ class _FlightDetailsPageState extends State<FlightDetailsPage> {
     await _flightDao.updateFlight(updatedFlight);
     _saveData();
     widget.onUpdate(updatedFlight);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.flight_updated)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.translate('flight_updated') ?? 'error')));
   }
 
   /// Deletes the flight from the database and calls the [onDelete] callback.
   void _deleteFlight() async {
     await _flightDao.deleteFlight(widget.flight);
     widget.onDelete(widget.flight);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.flight_deleted)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.translate('flight_deleted') ?? 'error')));
   }
 
   /// Loads saved data from encrypted shared preferences into the text controllers.
@@ -128,27 +128,27 @@ class _FlightDetailsPageState extends State<FlightDetailsPage> {
         Text('Flight ID: ${widget.flight.id}'),
         TextField(
           controller: _departureCityController,
-          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.departure_city),
+          decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('departure_city') ?? 'error'),
         ),
         TextField(
           controller: _destinationCityController,
-          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.destination_city),
+          decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('destination_city') ?? 'error'),
         ),
         TextField(
           controller: _departureTimeController,
-          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.departure_time),
+          decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('departure_time') ?? 'error'),
         ),
         TextField(
           controller: _arrivalTimeController,
-          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.arrival_time),
+          decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('arrival_time') ?? 'error'),
         ),
         ElevatedButton(
           onPressed: _updateFlight,
-          child: Text(AppLocalizations.of(context)!.update_flight),
+          child: Text(AppLocalizations.of(context)?.translate('update_flight') ?? 'error'),
         ),
         ElevatedButton(
           onPressed: _deleteFlight,
-          child: Text(AppLocalizations.of(context)!.delete_flight),
+          child: Text(AppLocalizations.of(context)?.translate('delete_flight') ?? 'error'),
         ),
       ],
     );
@@ -158,7 +158,7 @@ class _FlightDetailsPageState extends State<FlightDetailsPage> {
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.flight_details),
+          title: Text(AppLocalizations.of(context)?.translate('flight_details') ?? 'error'),
           actions: [
             IconButton(
               icon: Icon(Icons.language),

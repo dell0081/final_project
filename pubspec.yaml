@@ -31,3 +31,6 @@ flutter:
   uses-material-design: true
   generate: true
 
+  assets:
+    - assets/translations/fr_FR.json
+    - assets/translations/en_CA.json
