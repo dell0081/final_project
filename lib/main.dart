@@ -56,7 +56,7 @@ class MyAppState extends State<MyApp> {
           return appLocalizations == null
               ? const Center(child: CircularProgressIndicator())
               : MyHomePage(
-            title: "Switch",
+            title: "HomePage",
             changeLanguage: changeLanguage,
           );
         },
@@ -139,18 +139,6 @@ class MyHomePage extends StatelessWidget {
                 );
               },
               child: Text(AppLocalizations.of(context)?.translate('goToReservationList') ?? 'Go to Reservation List Page'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                changeLanguage(const Locale('en', 'CA'));
-              },
-              child: const Text('English'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                changeLanguage(const Locale('fr', 'FR'));
-              },
-              child: const Text('French'),
             ),
           ],
         ),
