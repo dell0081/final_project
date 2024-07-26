@@ -3,8 +3,20 @@ import 'flight.dart';
 import 'database.dart';
 import 'flight_dao.dart';
 import 'flight_details_page.dart';
+import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// A page that displays a list of flights and allows for adding, updating, and deleting flights.
+///
+/// The [FlightsListPage] is a stateful widget that interacts with the database to manage flights.
+/// It also supports language toggling.
 class FlightsListPage extends StatefulWidget {
+  /// Callback function to be called when the language is toggled.
+  final VoidCallback onLocaleToggle;
+
+  /// Constructs a [FlightsListPage] widget.
+  FlightsListPage({required this.onLocaleToggle});
+
   @override
   _FlightsListPageState createState() => _FlightsListPageState();
 }
@@ -17,19 +29,23 @@ class _FlightsListPageState extends State<FlightsListPage> {
   final List<Flight> _flights = [];
   Flight? _selectedFlight;
   late FlightDao _flightDao;
+  final EncryptedSharedPreferences _prefs = EncryptedSharedPreferences();
 
   @override
   void initState() {
     super.initState();
     _setupDatabase();
+    _loadSavedData();
   }
 
+  /// Sets up the database by building and getting the [FlightDao].
   void _setupDatabase() async {
     final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
     _flightDao = database.flightDao;
     _loadFlights();
   }
 
+  /// Adds a new flight to the database.
   void _addFlight() async {
     final departureCity = _departureCityController.text;
     final destinationCity = _destinationCityController.text;
@@ -37,26 +53,40 @@ class _FlightsListPageState extends State<FlightsListPage> {
     final arrivalTime = _arrivalTimeController.text;
 
     if (departureCity.isNotEmpty && destinationCity.isNotEmpty && departureTime.isNotEmpty && arrivalTime.isNotEmpty) {
-      final newFlight = Flight(departureCity: departureCity, destinationCity: destinationCity, departureTime: departureTime, arrivalTime: arrivalTime);
+      final newFlight = Flight(
+        departureCity: departureCity,
+        destinationCity: destinationCity,
+        departureTime: departureTime,
+        arrivalTime: arrivalTime,
+      );
       await _flightDao.insertFlight(newFlight);
+      _saveData();
       _loadFlights();
       _clearInputFields();
       _showFlightDetails(newFlight);
     } else {
-      _showErrorDialog('All fields must be filled');
+      _showErrorDialog(AppLocalizations.of(context)!.all_fields_required);
     }
   }
 
+  /// Updates an existing flight in the database.
+  ///
+  /// [flight] is the flight to be updated.
   void _updateFlight(Flight flight) async {
     await _flightDao.updateFlight(flight);
+    _saveData();
     _loadFlights();
   }
 
+  /// Deletes a flight from the database.
+  ///
+  /// [flight] is the flight to be deleted.
   void _deleteFlight(Flight flight) async {
     await _flightDao.deleteFlight(flight);
     _loadFlights();
   }
 
+  /// Loads all flights from the database and updates the state.
   void _loadFlights() async {
     final flights = await _flightDao.findAllFlights();
     setState(() {
@@ -65,21 +95,43 @@ class _FlightsListPageState extends State<FlightsListPage> {
     });
   }
 
+  /// Loads saved data from encrypted shared preferences into the text controllers.
+  void _loadSavedData() async {
+    _departureCityController.text = await _prefs.getString('departureCity') ?? '';
+    _destinationCityController.text = await _prefs.getString('destinationCity') ?? '';
+    _departureTimeController.text = await _prefs.getString('departureTime') ?? '';
+    _arrivalTimeController.text = await _prefs.getString('arrivalTime') ?? '';
+  }
+
+  /// Saves data from the text controllers into encrypted shared preferences.
+  void _saveData() {
+    _prefs.setString('departureCity', _departureCityController.text);
+    _prefs.setString('destinationCity', _destinationCityController.text);
+    _prefs.setString('departureTime', _departureTimeController.text);
+    _prefs.setString('arrivalTime', _arrivalTimeController.text);
+  }
+
+  /// Shows the details of a selected flight.
+  ///
+  /// [flight] is the flight whose details are to be shown.
   void _showFlightDetails(Flight flight) {
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => FlightDetailsPage(
-          flight: flight,
-          onUpdate: (updatedFlight) {
-            _updateFlight(updatedFlight);
-            _loadFlights();
-          },
-          onDelete: (deletedFlight) {
-            _deleteFlight(deletedFlight);
-            _loadFlights();
-          },
-        )),
+        MaterialPageRoute(
+          builder: (context) => FlightDetailsPage(
+            flight: flight,
+            onUpdate: (updatedFlight) {
+              _updateFlight(updatedFlight);
+              _loadFlights();
+            },
+            onDelete: (deletedFlight) {
+              _deleteFlight(deletedFlight);
+              _loadFlights();
+            },
+            onLocaleToggle: widget.onLocaleToggle, // Pass the onLocaleToggle function
+          ),
+        ),
       );
     } else {
       setState(() {
@@ -88,6 +140,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
     }
   }
 
+  /// Clears the input fields.
   void _clearInputFields() {
     _departureCityController.clear();
     _destinationCityController.clear();
@@ -96,11 +149,14 @@ class _FlightsListPageState extends State<FlightsListPage> {
     _selectedFlight = null;
   }
 
+  /// Shows an error dialog with the specified message.
+  ///
+  /// [message] is the error message to be shown in the dialog.
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Error'),
+        title: Text(AppLocalizations.of(context)!.error),
         content: Text(message),
         actions: [
           TextButton(
@@ -116,13 +172,11 @@ class _FlightsListPageState extends State<FlightsListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flights List'),
+        title: Text(AppLocalizations.of(context)!.go_to_flights_list_page),
         actions: [
           IconButton(
-            icon: Icon(Icons.info),
-            onPressed: () {
-              _showErrorDialog('Use this interface to manage flights.');
-            },
+            icon: Icon(Icons.language),
+            onPressed: widget.onLocaleToggle,
           ),
         ],
       ),
@@ -134,15 +188,15 @@ class _FlightsListPageState extends State<FlightsListPage> {
               children: [
                 TextField(
                   controller: _departureCityController,
-                  decoration: InputDecoration(labelText: 'Departure City'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.departure_city),
                 ),
                 TextField(
                   controller: _destinationCityController,
-                  decoration: InputDecoration(labelText: 'Destination City'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.destination_city),
                 ),
                 TextField(
                   controller: _departureTimeController,
-                  decoration: InputDecoration(labelText: 'Departure Time'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.departure_time),
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
@@ -155,7 +209,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
                 ),
                 TextField(
                   controller: _arrivalTimeController,
-                  decoration: InputDecoration(labelText: 'Arrival Time'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.arrival_time),
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
@@ -168,7 +222,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
                 ),
                 ElevatedButton(
                   onPressed: _addFlight,
-                  child: Text('Add Flight'),
+                  child: Text(AppLocalizations.of(context)!.add_flight),
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -177,7 +231,7 @@ class _FlightsListPageState extends State<FlightsListPage> {
                       final flight = _flights[index];
                       return ListTile(
                         title: Text('${flight.departureCity} to ${flight.destinationCity}'),
-                        subtitle: Text('Departure: ${flight.departureTime}, Arrival: ${flight.arrivalTime}'),
+                        subtitle: Text('${AppLocalizations.of(context)!.departure}: ${flight.departureTime}, ${AppLocalizations.of(context)!.arrival}: ${flight.arrivalTime}'),
                         onTap: () {
                           _showFlightDetails(flight);
                         },
@@ -208,8 +262,9 @@ class _FlightsListPageState extends State<FlightsListPage> {
                     _loadFlights();
                   });
                 },
+                onLocaleToggle: widget.onLocaleToggle, // Pass the onLocaleToggle function
               )
-                  : Center(child: Text('Select a flight to view details')),
+                  : Center(child: Text(AppLocalizations.of(context)!.use_interface)),
             ),
         ],
       ),
