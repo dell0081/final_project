@@ -9,7 +9,7 @@ class Customer {
   /// `autoGenerate: true` ensures that the `id` is automatically generated.
   @PrimaryKey(autoGenerate: true) // unique id
   final int id;
-
+  // firstname column
   final String firstName;
 
   /// `lastName` will be a column in the `Customer` table representing the last name of the customer
