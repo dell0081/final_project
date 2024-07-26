@@ -6,9 +6,9 @@
 library;
 
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
-import 'package:final_project/app_localizations.dart';
-import 'package:final_project/customer_dao.dart';
-import 'package:final_project/customer_database.dart';
+import 'package:final_project/Customer/app_localizations.dart';
+import 'package:final_project/Customer/customer_dao.dart';
+import 'package:final_project/Customer/customer_database.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:math';

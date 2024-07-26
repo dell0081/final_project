@@ -8,8 +8,8 @@ import 'package:floor/floor.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 
-import 'package:final_project/customer.dart';
-import 'package:final_project/customer_dao.dart';
+import 'package:final_project/Customer/customer.dart';
+import 'package:final_project/Customer/customer_dao.dart';
 
 
 // The generated code for the database will be part of this file.
