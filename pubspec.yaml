@@ -14,20 +14,17 @@ dependencies:
   floor: ^1.4.0
   sqflite: ^2.0.0+4
   path: ^1.8.0
-  flutter_localizations:
-    sdk: flutter
   intl: ^0.19.0
   encrypted_shared_preferences: ^3.0.1
   dartdoc: ^8.0.8
 
 dev_dependencies:
   floor_generator: ^1.4.0
-  build_runner: ^2.1.2
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
   build_runner: ^2.1.4
-  floor_generator: ^1.1.0
+
   dartdoc: ^8.0.7
 
 flutter:
