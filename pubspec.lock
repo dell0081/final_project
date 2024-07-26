@@ -197,10 +197,10 @@ packages:
     dependency: transitive
     description:
       name: dev_build
-      sha256: cd2d110dc7ca372cc45d4eba79e4be9eb54ceda673687305b82be367aad8c652
+      sha256: "5600100e28f7424ed53728e8e7aa6bc0e0506ec04bb49a82616f62112c1822c3"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0+7"
+    version: "1.0.0+8"
   encrypt:
     dependency: transitive
     description:
@@ -545,10 +545,10 @@ packages:
     dependency: transitive
     description:
       name: process_run
-      sha256: "6052115540ad88715d6bcee60656970f70c68c85846d1948b92e435f0382899e"
+      sha256: c917dfb5f7afad4c7485bc00a4df038621248fce046105020cea276d1a87c820
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0+1"
+    version: "1.1.0"
   pub_semver:
     dependency: transitive
     description:
@@ -577,10 +577,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_android
-      sha256: "93d0ec9dd902d85f326068e6a899487d1f65ffcd5798721a95330b26c8131577"
+      sha256: "3d4571b3c5eb58ce52a419d86e655493d0bc3020672da79f72fa0c16ca3a8ec1"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.3"
+    version: "2.2.4"
   shared_preferences_foundation:
     dependency: transitive
     description:
@@ -686,10 +686,10 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common_ffi_web
-      sha256: cfc9d1c61a3e06e5b2e96994a44b11125b4f451fee95b9fad8bd473b4613d592
+      sha256: a6ca44b3cb68167b7bb7c7b9576721e2028550ad549897fe97fdff173b69151b
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.3+1"
+    version: "0.4.3+2"
   sqlite3:
     dependency: transitive
     description:

@@ -1,3 +1,10 @@
+/// Name: Khushpreet Kaur
+/// Assignment: Final Project
+/// Subject: CST2335
+/// Description: It is my own original work free from Plagiarism.
+
+library;
+
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:final_project/app_localizations.dart';
 import 'package:final_project/customer_dao.dart';
@@ -36,13 +43,14 @@ class CustomerListPageState extends State<CustomerListPage> {
   int updateId = 0;
   Customer? selected;
 
+///Method to change the language of the app.
   void changeLanguage(Locale newLocale) {
     // setState(() {
     //   _locale = newLocale;
     // });
     widget.onLocaleChange(newLocale);
   }
-
+/// Method to clear all text fields.
   void clearAll() {
     for (var controller in controllers) {
       controller.clear();
@@ -51,18 +59,18 @@ class CustomerListPageState extends State<CustomerListPage> {
       updated = false;
     });
   }
-
+  /// Method to check if the device is in landscape mode.
   bool landscape() {
     var size = MediaQuery.of(context).size;
     var height = size.height;
     var width = size.width;
     return (width > height) && (width > 720);
   }
-
+  /// Method to translate a word using the app's localization.
   String translate(String word) {
     return AppLocalizations.of(context)?.translate(word) ?? 'Hello';
   }
-
+  /// Method to display previously stored data in text fields.
   Future<void> displayPrevious() async {
     for (var i = 0; i < controllers.length; i++) {
       controllers[i].text = await prefs.getString(names[i]);
@@ -70,7 +78,7 @@ class CustomerListPageState extends State<CustomerListPage> {
 
     display();
   }
-
+  /// Method to display a date picker dialog and return the selected date.
   Future<DateTime?> selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -80,7 +88,7 @@ class CustomerListPageState extends State<CustomerListPage> {
     );
     return pickedDate;
   }
-
+  /// Method to add a new customer or update an existing customer.
   Future<void> addAndUpdate(Customer customer) async {
     await myDAO.insertCustomer(customer);
     display();
@@ -91,7 +99,7 @@ class CustomerListPageState extends State<CustomerListPage> {
   }
 
   late CustomerDAO myDAO;
-
+  /// Method to check the highest existing customer ID and return the next ID.
   Future<int> checkId() async {
     int maxId = customers.isNotEmpty ? customers.map((customer) => customer.id).reduce(max) : 0;
 
@@ -104,7 +112,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       customers = customerList;
     });
   }
-
+  /// Method to add a new customer.
   Future<void> add(String firstName, String lastName, String address, String birthday) async {
     int id = await checkId();
 
@@ -112,6 +120,7 @@ class CustomerListPageState extends State<CustomerListPage> {
     await addAndUpdate(customer);
   }
 
+  /// Method to display a snack bar when input fields are empty.
   void emptyInputSnackBar(BuildContext context) {
     final snackBar = SnackBar(
       content: const Text('All information should be provided'),
@@ -124,7 +133,7 @@ class CustomerListPageState extends State<CustomerListPage> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
-
+  /// Method to delete a customer by ID.
   Future<void> delete(int id) async {
     final temp = await myDAO.getCustomer(id).first;
     if (temp != null) {
@@ -133,7 +142,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       display();
     }
   }
-
+  /// Method to prepare a customer for updating.
   Future<void> update1(Customer customer) async {
     setState(() {
       updated = true;
@@ -145,12 +154,12 @@ class CustomerListPageState extends State<CustomerListPage> {
       _customersAddressController.text = customer.address;
     });
   }
-
+  /// Method to update a customer in the database.
   Future<void> update2(Customer customer) async {
     await myDAO.updateCustomer(customer);
     display();
   }
-
+  /// Method to display an alert dialog for confirming customer deletion.
   void displayAlert(Customer customer) {
     showDialog<String>(
       context: context,
@@ -206,6 +215,7 @@ class CustomerListPageState extends State<CustomerListPage> {
               Navigator.pop(context);
             },
           ),
+          /// Delete Button
           ElevatedButton(
             child: const Text('Delete'),
             onPressed: () {
@@ -217,7 +227,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       ),
     );
   }
-
+  /// Method to display a help dialog.
   void displayHelp() {
     showDialog<String>(
       context: context,
@@ -279,7 +289,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       ),
     );
   }
-
+  /// Method to display a dialog for changing the language.
   void showChangeLanguage() {
     showDialog<String>(
       context: context,
@@ -386,6 +396,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       },
     );
   }
+  /// Method to build the detail form for customer input.
 
   Widget details(bool helpB) {
     return Column(children: [
@@ -459,7 +470,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       buttons(helpB),
     ]);
   }
-
+  /// Method to build the action buttons.
   Widget buttons(bool helpB) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -544,7 +555,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       ],
     );
   }
-
+  /// Method to build the help button.
   Widget helpButton() {
     return ElevatedButton(
       child: const Icon(Icons.help),
@@ -553,7 +564,7 @@ class CustomerListPageState extends State<CustomerListPage> {
       },
     );
   }
-
+  /// Method to build the help button row.
   Widget helpButtonRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
