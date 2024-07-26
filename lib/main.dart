@@ -5,10 +5,11 @@ import 'airplane_list_page.dart';
 import 'flights_list_page.dart';
 import 'reservation_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'AppLocalizations.dart';
 
 /// The main entry point for the application.
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 /// The root widget of the application.
@@ -19,22 +20,29 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  Locale _locale = Locale('en');
+class MyAppState extends State<MyApp> {
+  Locale locale = const Locale('en', 'CA');
 
-  /// Toggles the language between English and French.
-  void _toggleLanguage() {
+  void changeLanguage(Locale newLocale) {
     setState(() {
-      _locale = _locale.languageCode == 'en' ? Locale('fr') : Locale('en');
+      locale = newLocale;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      supportedLocales: const [Locale('fr', 'FR'), Locale('en', 'CA')],
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: [
@@ -59,7 +67,7 @@ class _MyAppState extends State<MyApp> {
               ? const Center(child: CircularProgressIndicator())
               : MyHomePage(
             title: appLocalizations.title,
-            onLocaleToggle: _toggleLanguage,
+            changeLanguage: changeLanguage,
           );
         },
       ),
@@ -72,17 +80,14 @@ class _MyAppState extends State<MyApp> {
 /// This widget displays buttons to navigate to different pages and a language toggle button.
 class MyHomePage extends StatelessWidget {
   final String title;
-  final VoidCallback onLocaleToggle;
+  final Function(Locale) changeLanguage;
 
   /// Constructs a [MyHomePage] widget.
   ///
   /// [title] is the title of the home page.
   /// [onLocaleToggle] is the callback function to toggle the language.
-  const MyHomePage({
-    super.key,
-    required this.title,
-    required this.onLocaleToggle,
-  });
+  const MyHomePage(
+      {super.key, required this.title, required this.changeLanguage});
 
   @override
   Widget build(BuildContext context) {
@@ -116,8 +121,7 @@ class MyHomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AirplaneListPage(),
-                  ),
+                    builder: (context) => const AirplaneListPage()),
                 );
               },
               child: Text(AppLocalizations.of(context)!.go_to_airplane_list_page),
@@ -145,6 +149,17 @@ class MyHomePage extends StatelessWidget {
                 );
               },
               child: Text(AppLocalizations.of(context)!.go_to_reservation_page),
+              ElevatedButton(
+              onPressed: () {
+                changeLanguage(const Locale('en', 'CA'));
+              },
+              child: const Text('English'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                changeLanguage(const Locale('fr', 'FR'));
+              },
+              child: const Text('French'),
             ),
           ],
         ),
