@@ -1,0 +1,13 @@
+{
+  "customer_list_page": "Customer List Page",
+  "add_first_name": "Add First Name",
+  "add_last_name": "Add Last Name",
+  "add_birthdate": "Add Birthdate",
+  "add_address": "Add Address",
+  "customer_list_help": "Customer List Help",
+  "add_new_customer": "Add New Customer",
+  "clear_customer_information": "Clear Customer Information",
+  "previous_customer_information": "Previous Customer Information",
+  "update_customer": "Update Customer",
+  "delete_customer":"Delete Customer"
+}
