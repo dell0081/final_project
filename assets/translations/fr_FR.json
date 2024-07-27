@@ -1,0 +1,13 @@
+{
+  "customer_list_page": "Page de la liste des clients",
+  "add_first_name": "Ajouter un prénom",
+  "add_last_name": "Ajouter un nom de famille",
+  "add_birthdate": "Ajouter une date de naissance",
+  "add_address": "Ajouter une adresse",
+  "customer_list_help": "Aide à la liste des clients",
+  "add_new_customer": "Ajouter un nouveau client",
+  "clear_customer_information": "Effacer les informations du client",
+  "previous_customer_information": "Informations sur le client précédent",
+  "update_customer": "Mettre à jour le client",
+  "delete_customer": "Supprimer le client"
+}
