@@ -290,6 +290,7 @@ packages:
     source: hosted
     version: "1.5.0"
   floor_generator:
+    dependency: "direct dev"
     dependency: "direct main"
     description:
       name: floor_generator
@@ -511,6 +512,14 @@ packages:
     version: "2.1.0"
   path:
     dependency: transitive
+    description:
+      name: package_config
+      sha256: "1c5b77ccc91e4823a5af61ee74e6b972db1ef98c2ff5a18d3161c982a55448bd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
+  path:
+    dependency: "direct main"
     description:
       name: path
       sha256: "087ce49c3f0dc39180befefc60fdb4acd8f8620e5682fe2476afd0b3688bb4af"
@@ -837,7 +846,7 @@ packages:
   vm_service:
     dependency: transitive
     description:
-      name: vm_service
+    https://github.com/dell0081/final_project/pull/2/conflict?name=pubspec.lock&ancestor_oid=ed4160b1d922abd581ad9d95a49e440453a9fda6&base_oid=3b57c9bb82dfd23c2d01e03328799621bd9f5139&head_oid=947e620bcbe4ded55df72fc0bafaacedc03f6fbd  name: vm_service
       sha256: "3923c89304b715fb1eb6423f017651664a03bf5f4b29983627c4da791f74a4ec"
       url: "https://pub.dev"
     source: hosted
