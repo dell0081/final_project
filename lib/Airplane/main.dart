@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import '../customer_list_page.dart';
-import 'airplane_list_page.dart';
 import '../flights_list_page.dart';
+import '../Customer/customer_list_page.dart';
+import '../airplane_list_page.dart';
 import '../reservation_page.dart';
 import 'AppLocalizations.dart';
 
@@ -72,7 +72,7 @@ class MyHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CustomerListPage()),
+                  MaterialPageRoute(builder: (context) => CustomerListPage(onLocaleChange: (Locale ) {  },)),
                 );
               },
               child: const Text('Go to Customer List Page'),
@@ -82,7 +82,7 @@ class MyHomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const AirplaneListPage()),
+                      builder: (context) => AirplaneListPage()),
                 );
               },
               child: const Text('Go to Airplane List Page'),
