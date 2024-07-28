@@ -21,5 +21,21 @@
   "ok": "Ok",
   "change_language": "Change Language",
   "english": "English",
-  "french": "French"
+  "french": "French",
+  "title": "Reservation List",
+  "enterCustomerId": "Enter Customer ID",
+  "enterFlightId": "Enter Flight ID",
+  "enterDate": "Enter Date (YYYY-MM-DD)",
+  "add": "Add",
+  "noReservationsFound": "No reservations found.",
+  "reservationDetails": "Reservation Details",
+  "customerId": "Customer ID: {customerId}",
+  "flightId": "Flight ID: {flightId}",
+  "date": "Date: {date}",
+  "clear": "Clear",
+  "reservationAdded": "Reservation Added",
+  "reservationAddedContent": "Reservation with ID {id} has been added successfully.",
+  "invalidInput": "Invalid Input! Check Instructions.",
+  "reservationNotFound": "Reservation not found.",
+  "deleteConfirmation": "Are you sure you want to delete this reservation?"
 }
