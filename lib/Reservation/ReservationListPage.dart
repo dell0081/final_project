@@ -1,307 +1,319 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'Reservation.dart';
 import 'ReservationDAO.dart';
 import 'ReservationDB.dart';
+import 'app_localizations.dart';
 
 class ReservationListPage extends StatefulWidget {
-  const ReservationListPage({super.key});
+  final ReservationDatabase database;
+
+  const ReservationListPage({super.key, required this.database});
 
   @override
-  State<StatefulWidget> createState() => ReservationListPageState();
+  State<StatefulWidget> createState() => _ReservationListPageState();
 }
 
-class ReservationListPageState extends State<ReservationListPage> {
-  Reservation? selected;
-  late List<Reservation> reservations = [];
-  late ReservationDAO dao;
-  late TextEditingController customerIdController;
-  late TextEditingController flightIdController;
-  late TextEditingController dateController;
+class _ReservationListPageState extends State<ReservationListPage> {
+  late Future<List<Reservation>> _reservations;
+  Reservation? _selectedReservation;
+  late TextEditingController _customerIdController;
+  late TextEditingController _flightIdController;
+  late TextEditingController _dateController;
+  Locale _locale = Locale('en', 'CA');
 
   @override
   void initState() {
     super.initState();
-    customerIdController = TextEditingController();
-    flightIdController = TextEditingController();
-    dateController = TextEditingController();
-    createDB();
+    _customerIdController = TextEditingController();
+    _flightIdController = TextEditingController();
+    _dateController = TextEditingController();
+    _loadReservations();
   }
 
-  Future<void> createDB() async {
-    final database = await $FloorReservationDatabase.databaseBuilder('reservation_database.db').build();
-    dao = database.reservationDAO;
-    load();
-  }
-
-  Future<void> load() async {
-    final temp = await dao.findAllReservations();
+  void _loadReservations() {
     setState(() {
-      reservations = temp.cast<Reservation>();
+      _reservations = widget.database.reservationDAO.findAllReservations();
     });
   }
 
-  Future<void> add(int customerId, int flightId, String date) async {
-    int id = await checkId();
-    final reservation = Reservation(id, customerId, flightId, date);
-    await dao.insertReservation(reservation);
-    customerIdController.clear();
-    flightIdController.clear();
-    dateController.clear();
-    load();
+  Future<void> _addReservation() async {
+    try {
+      int customerId = int.parse(_customerIdController.text);
+      int flightId = int.parse(_flightIdController.text);
+      String date = _dateController.text;
+      int id = await _checkId();
 
-    // Show confirmation dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Reservation Added'),
-          content: Text('Reservation with ID $id has been added successfully.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+      final reservation = Reservation(id, customerId, flightId, date);
+      await widget.database.reservationDAO.insertReservation(reservation);
+
+      _customerIdController.clear();
+      _flightIdController.clear();
+      _dateController.clear();
+
+      _loadReservations();
+
+      // Show confirmation dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(AppLocalizations.of(context).translate('reservationAdded')),
+            content: Text(AppLocalizations.of(context).translate('reservationAddedContent').replaceFirst('{id}', id.toString())),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(AppLocalizations.of(context).translate('ok')),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      _showInvalidInputSnackBar();
+    }
   }
 
-  Future<void> delete(int id) async {
-    final reservationStream = dao.findReservation(id);
+  Future<void> _deleteReservation(int id) async {
+    final reservationStream = widget.database.reservationDAO.findReservation(id);
     reservationStream.listen((reservation) async {
       if (reservation != null) {
-        await dao.deleteReservation(reservation);
-        load();
+        await widget.database.reservationDAO.deleteReservation(reservation);
+        _loadReservations();
       } else {
-        // Optionally handle the case where the reservation was not found
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reservation not found.')),
-        );
+        _showNotFoundSnackBar();
       }
     });
   }
 
-  Future<int> checkId() async {
-    List<Reservation> allReservations = (await dao.findAllReservations()).cast<Reservation>();
-    int maxId = 0;
-    for (Reservation reservation in allReservations) {
-      if (reservation.id > maxId) {
-        maxId = reservation.id;
-      }
-    }
+  Future<int> _checkId() async {
+    List<Reservation> allReservations = await widget.database.reservationDAO.findAllReservations();
+    int maxId = allReservations.fold(0, (prev, reservation) => reservation.id > prev ? reservation.id : prev);
     return maxId + 1;
   }
 
-  void _showInstructions() {
+  void _showInvalidInputSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context).translate('invalidInput')),
+        action: SnackBarAction(
+          label: AppLocalizations.of(context).translate('clear'),
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showNotFoundSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context).translate('reservationNotFound')),
+      ),
+    );
+  }
+
+  void _toggleLanguage() {
+    setState(() {
+      _locale = _locale.languageCode == 'en' ? Locale('fr', 'FR') : Locale('en', 'CA');
+    });
+  }
+
+  void _showInstructionsDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Instructions'),
-          content: const Text(
-              '1. Add a reservation by filling in the Customer ID, Flight ID, and Date fields, then click the Add button.\n'
-                  '2. View all reservations in the list below.\n'
-                  '3. Click on a reservation to see its details.\n'
-                  '4. Delete a reservation by clicking the delete icon next to it.\n'
-                  '5. The app will save the data securely for your next use.'
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context).translate('Instructions')),
+        content: Text(AppLocalizations.of(context).translate('instructionsContent')),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(AppLocalizations.of(context).translate('ok')),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
+        ],
+      ),
     );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        _dateController.text = "${picked.toLocal()}".split(' ')[0];
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reservation List'),
+        title: Text(AppLocalizations.of(context).translate('Reservation Page')),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: _showInstructions,
+            icon: Icon(Icons.translate),
+            onPressed: _toggleLanguage,
+          ),
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: _showInstructionsDialog,
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            const Text('This is the Reservation List Page'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Flexible(
-                  child: TextField(
-                    controller: customerIdController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Enter Customer ID",
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: TextField(
-                    controller: flightIdController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Enter Flight ID",
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: TextField(
-                    controller: dateController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Enter Date (YYYY-MM-DD)",
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  child: const Text('Add'),
-                  onPressed: () {
-                    try {
-                      int customerId = int.parse(customerIdController.text);
-                      int flightId = int.parse(flightIdController.text);
-                      String date = dateController.text;
-                      add(customerId, flightId, date);
-                    } catch (e) {
-                      invalidInputSnackBar();
-                    }
-                  },
-                ),
-              ],
-            ),
-            Expanded(child: display()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void invalidInputSnackBar() {
-    var snackBar = SnackBar(
-        content: const Text('Invalid Input! Check Instructions.'),
-        action: SnackBarAction(
-            label: 'Hide',
-            onPressed: () {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            }));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  Widget display() {
-    var size = MediaQuery.of(context).size;
-    var height = size.height;
-    var width = size.width;
-
-    if ((width > height) && (width > 720)) {
-      return Row(
-        children: [
-          Expanded(flex: 1, child: listReservations()),
-          Expanded(flex: 2, child: listReservationDetails()),
-        ],
-      );
-    } else {
-      if (selected == null) {
-        return listReservations();
-      } else {
-        return listReservationDetails();
-      }
-    }
-  }
-
-  Widget listReservations() {
-    return ListView.builder(
-      itemCount: reservations.length,
-      itemBuilder: (context, index) {
-        final reservation = reservations[index];
-        return GestureDetector(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: Localizations.override(
+        context: context,
+        locale: _locale,
+        child: Builder(
+          builder: (context) => Row(
             children: [
-              Text('Reservation ${reservation.id}'),
-            ],
-          ),
-          onTap: () {
-            setState(() {
-              selected = reservation;
-            });
-          },
-        );
-      },
-    );
-  }
-
-  Widget listReservationDetails() {
-    if (selected != null) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('Reservation Details', style: TextStyle(fontSize: 30.0)),
-              Text('Customer ID: ${selected!.customerId}', style: const TextStyle(fontSize: 20.0)),
-              Text('Flight ID: ${selected!.flightId}', style: const TextStyle(fontSize: 20.0)),
-              Text('Date: ${selected!.date}', style: const TextStyle(fontSize: 20.0)),
-            ],
-          ),
-          ElevatedButton(
-            child: const Text('Delete'),
-            onPressed: () {
-              showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  content: const Text('Are you sure you want to delete this reservation?'),
-                  actions: <Widget>[
-                    ElevatedButton(
-                      child: const Text('Yes'),
-                      onPressed: () {
-                        setState(() {
-                          delete(selected!.id);
-                          setState(() {
-                            selected = null;
-                            load();
-                          });
-                        });
-                        Navigator.pop(context);
-                      },
+              Expanded(
+                flex: 2,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _customerIdController,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: AppLocalizations.of(context).translate('enterCustomerId'),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                              controller: _flightIdController,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: AppLocalizations.of(context).translate('enterFlightId'),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => _selectDate(context),
+                              child: AbsorbPointer(
+                                child: TextField(
+                                  controller: _dateController,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: AppLocalizations.of(context).translate('enterDate'),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: _addReservation,
+                            child: Text(AppLocalizations.of(context).translate('add')),
+                          ),
+                        ],
+                      ),
                     ),
-                    ElevatedButton(
-                      child: const Text('No'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                    Expanded(
+                      child: FutureBuilder<List<Reservation>>(
+                        future: _reservations,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Center(child: Text(AppLocalizations.of(context).translate('noReservationsFound')));
+                          } else {
+                            return ListView.builder(
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                final reservation = snapshot.data![index];
+                                return ListTile(
+                                  title: Text('${AppLocalizations.of(context).translate('reservation')} ${reservation.id}'),
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedReservation = reservation;
+                                    });
+                                  },
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ],
                 ),
-              );
-            },
+              ),
+              VerticalDivider(),
+              Expanded(
+                flex: 1,
+                child: _selectedReservation != null
+                    ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context).translate('reservationDetails'),
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 16),
+                      Text('${AppLocalizations.of(context).translate('customerId').replaceFirst('{customerId}', _selectedReservation!.customerId.toString())}', style: TextStyle(fontSize: 18)),
+                      Text('${AppLocalizations.of(context).translate('flightId').replaceFirst('{flightId}', _selectedReservation!.flightId.toString())}', style: TextStyle(fontSize: 18)),
+                      Text('${AppLocalizations.of(context).translate('date').replaceFirst('{date}', _selectedReservation!.date)}', style: TextStyle(fontSize: 18)),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(AppLocalizations.of(context).translate('deleteConfirmation')),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    _deleteReservation(_selectedReservation!.id);
+                                    setState(() {
+                                      _selectedReservation = null;
+                                    });
+                                  },
+                                  child: Text(AppLocalizations.of(context).translate('delete')),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text(AppLocalizations.of(context).translate('cancel')),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        child: Text(AppLocalizations.of(context).translate('delete')),
+                      ),
+                    ],
+                  ),
+                )
+                    : Center(child: Text(AppLocalizations.of(context).translate('previousCustomerInformation'))),
+              ),
+            ],
           ),
-          ElevatedButton(
-            child: const Text('Clear'),
-            onPressed: () {
-              setState(() {
-                selected = null;
-              });
-            },
-          ),
-        ],
-      );
-    } else {
-      return Container();
-    }
+        ),
+      ),
+    );
   }
 }
