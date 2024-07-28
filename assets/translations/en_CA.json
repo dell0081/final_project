@@ -9,5 +9,17 @@
   "clear_customer_information": "Clear Customer Information",
   "previous_customer_information": "Previous Customer Information",
   "update_customer": "Update Customer",
-  "delete_customer":"Delete Customer"
+  "delete_customer":"Delete Customer",
+  "hello": "Hello",
+  "all_information_should_be_provided": "All information should be provided",
+  "first_name": "First Name:",
+  "last_name": "Last Name:",
+  "birthday": "Birthday",
+  "address": "Address:",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "ok": "Ok",
+  "change_language": "Change Language",
+  "english": "English",
+  "french": "French"
 }

@@ -9,5 +9,17 @@
   "clear_customer_information": "Effacer les informations du client",
   "previous_customer_information": "Informations sur le client précédent",
   "update_customer": "Mettre à jour le client",
-  "delete_customer": "Supprimer le client"
+  "delete_customer": "Supprimer le client",
+  "hello": "Bonjour",
+  "all_information_should_be_provided": "Toutes les informations doivent être fournies",
+  "first_name": "Prénom:",
+  "last_name": "Nom de Famille:",
+  "birthday": "Date de naissance",
+  "address": "Adresse:",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "ok": "D'accord",
+  "change_language": "Changer la Langue",
+  "english": "Anglais",
+  "french": "Français"
 }

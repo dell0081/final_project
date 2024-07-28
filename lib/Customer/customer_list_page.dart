@@ -68,7 +68,7 @@ class CustomerListPageState extends State<CustomerListPage> {
   }
   /// Method to translate a word using the app's localization.
   String translate(String word) {
-    return AppLocalizations.of(context)?.translate(word) ?? 'Hello';
+    return AppLocalizations.of(context)?.translate(word) ?? translate("hello");
   }
   /// Method to display previously stored data in text fields.
   Future<void> displayPrevious() async {
@@ -123,9 +123,9 @@ class CustomerListPageState extends State<CustomerListPage> {
   /// Method to display a snack bar when input fields are empty.
   void emptyInputSnackBar(BuildContext context) {
     final snackBar = SnackBar(
-      content: const Text('All information should be provided'),
+      content: Text(translate("all_information_should_be_provided")),
       action: SnackBarAction(
-        label: 'OK',
+        label: translate('ok'),
         onPressed: () {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
         },
@@ -171,7 +171,7 @@ class CustomerListPageState extends State<CustomerListPage> {
               alignment: Alignment.centerLeft,
               child: Text.rich(
                 TextSpan(
-                  text: translate('delete'),
+                  text: translate('delete_customer'),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.purple, // Highlight color
@@ -182,14 +182,14 @@ class CustomerListPageState extends State<CustomerListPage> {
             const SizedBox(height: 16),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('First Name:'),
-                      Text('Last Name:'),
-                      Text('Birthday:'),
-                      Text('Address:'),
+                      Text(translate("first_name")),
+                      Text(translate("last_name")),
+                      Text(translate("birthday")),
+                      Text(translate("address")),
                     ],
                   ),
                 ),
@@ -210,14 +210,14 @@ class CustomerListPageState extends State<CustomerListPage> {
         ),
         actions: <Widget>[
           ElevatedButton(
-            child: const Text('Cancel'),
+            child: Text(translate("cancel")),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           /// Delete Button
           ElevatedButton(
-            child: const Text('Delete'),
+            child: Text(translate("delete")),
             onPressed: () {
               delete(customer.id);
               Navigator.pop(context);
@@ -239,7 +239,7 @@ class CustomerListPageState extends State<CustomerListPage> {
               alignment: Alignment.centerLeft,
               child: Text.rich(
                 TextSpan(
-                  text: translate('helpTitle'),
+                  text: translate('customer_list_help'),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.purple, // Highlight color
@@ -256,23 +256,23 @@ class CustomerListPageState extends State<CustomerListPage> {
               children: [
                 TableRow(children: [
                   const Text('+', style: TextStyle(fontSize: 15)),
-                  Text(translate('add'), style: const TextStyle(fontSize: 12)),
+                  Text(translate('add_new_customer'), style: const TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
                   const Icon(Icons.clear),
-                  Text(translate('clear'), style: const TextStyle(fontSize: 12)),
+                  Text(translate('clear_customer_information'), style: const TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
                   const Icon(Icons.arrow_back),
-                  Text(translate('previous'), style: const TextStyle(fontSize: 12)),
+                  Text(translate('previous_customer_information'), style: const TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
                   const Icon(Icons.check_box),
-                  Text(translate('update'), style: const TextStyle(fontSize: 12)),
+                  Text(translate('update_customer'), style: const TextStyle(fontSize: 12)),
                 ]),
                 TableRow(children: [
                   const Text('-', style: TextStyle(fontSize: 15)),
-                  Text(translate('delete'), style: const TextStyle(fontSize: 12)),
+                  Text(translate('delete_customer'), style: const TextStyle(fontSize: 12)),
                 ]),
               ],
             ),
@@ -280,7 +280,7 @@ class CustomerListPageState extends State<CustomerListPage> {
         ),
         actions: <Widget>[
           ElevatedButton(
-            child: const Text('Ok'),
+            child: Text(translate("ok")),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -294,41 +294,41 @@ class CustomerListPageState extends State<CustomerListPage> {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Align(
               alignment: Alignment.centerLeft,
               child: Text.rich(
                 TextSpan(
-                  text: 'Change Language',
-                  style: TextStyle(
+                  text: translate('change_language'),
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.purple, // Highlight color
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
           ],
         ),
         actions: <Widget>[
           ElevatedButton(
-            child: const Text('English'),
+            child: Text(translate('english')),
             onPressed: () {
               changeLanguage(englishLocale);
               Navigator.pop(context);
             },
           ),
           ElevatedButton(
-            child: const Text('French'),
+            child: Text(translate('french')),
             onPressed: () {
               changeLanguage(frenchLocale);
               Navigator.pop(context);
             },
           ),
           ElevatedButton(
-            child: const Text('Cancel'),
+            child: Text(translate('cancel')),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -407,7 +407,7 @@ class CustomerListPageState extends State<CustomerListPage> {
               controller: _customersFirstNameController,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                hintText: translate('firstName'),
+                hintText: translate('add_first_name'),
               ),
             ),
           ),
@@ -421,7 +421,7 @@ class CustomerListPageState extends State<CustomerListPage> {
               controller: _customersLastNameController,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                hintText: translate('lastName'),
+                hintText: translate('add_last_name'),
               ),
             ),
           ),
@@ -435,7 +435,7 @@ class CustomerListPageState extends State<CustomerListPage> {
               controller: _customersBirthdayController,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                hintText: translate('birthdate'),
+                hintText: translate('add_birthdate'),
               ),
               onTap: () async {
                 DateTime? date = await showDatePicker(
@@ -461,7 +461,7 @@ class CustomerListPageState extends State<CustomerListPage> {
               controller: _customersAddressController,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                hintText: translate('address'),
+                hintText: translate('add_address'),
               ),
             ),
           ),
@@ -578,7 +578,7 @@ class CustomerListPageState extends State<CustomerListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)?.translate('title') ?? 'Customer List'),
+        title: Text(AppLocalizations.of(context)?.translate('customer_list_page') ?? 'Customer List'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.language),
