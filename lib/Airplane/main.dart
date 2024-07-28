@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../flights_list_page.dart';
 import '../Customer/customer_list_page.dart';
-import '../airplane_list_page.dart';
+import 'airplane_list_page.dart';
 import '../reservation_page.dart';
 import 'AppLocalizations.dart';
 
