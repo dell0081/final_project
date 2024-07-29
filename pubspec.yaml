@@ -3,34 +3,28 @@ description: "A new Flutter project."
 publish_to: 'none'
 version: 1.0.0+1
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: '>=3.4.3 <4.0.0'
 
 dependencies:
-  flutter_localizations:
-    sdk: flutter
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
-  floor: ^1.4.0
+  floor: ^1.1.0
   sqflite: ^2.0.0+4
   path: ^1.8.0
-  intl: ^0.19.0
-  encrypted_shared_preferences: ^3.0.1
-  dartdoc: ^8.0.8
+  flutter_localizations:
+    sdk: flutter
+  encrypted_shared_preferences: ^2.0.0
 
 dev_dependencies:
-  floor_generator: ^1.4.0
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
   build_runner: ^2.1.4
-
+  floor_generator: ^1.1.0
   dartdoc: ^8.0.7
 
 flutter:
   uses-material-design: true
   generate: true
 
-  assets:
-    - assets/translations/fr_FR.json
-    - assets/translations/en_CA.json
