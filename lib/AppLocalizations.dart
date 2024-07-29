@@ -28,8 +28,15 @@ class AppLocalizations {
     return true;
   }
 
-  String? translate(String key) {
-    return _localizedStrings[key];
+  String translate(String? key) {
+    if(key == null){
+      return "noTranslation";
+    }
+    String? translation = _localizedStrings[key];
+    if(translation== null){
+      return "noTranslation";
+    }
+    return translation;
   }
 }
 

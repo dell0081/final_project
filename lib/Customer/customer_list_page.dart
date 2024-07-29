@@ -6,10 +6,11 @@
 library;
 
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
-import 'package:final_project/Customer/app_localizations.dart';
+// import 'package:final_project/Customer/app_localizations.dart';
 import 'package:final_project/Customer/customer_dao.dart';
 import 'package:final_project/Customer/customer_database.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project/AppLocalizations.dart';
 
 import 'dart:math';
 import 'customer.dart';
@@ -68,7 +69,7 @@ class CustomerListPageState extends State<CustomerListPage> {
   }
   /// Method to translate a word using the app's localization.
   String translate(String word) {
-    return AppLocalizations.of(context)?.translate(word) ?? translate("hello");
+    return AppLocalizations.of(context)?.translate(word) ??("hello");
   }
   /// Method to display previously stored data in text fields.
   Future<void> displayPrevious() async {

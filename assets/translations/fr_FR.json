@@ -56,5 +56,10 @@
   "distance": "Distance: ",
   "delMessage": "Etes-vous sûr de vouloir supprimer cet avion?",
   "yes": "Oui",
-  "no": "Non"
+  "no": "Non",
+  "goToCustomerList": "Aller à la page de la liste des clients",
+  "goToAirplaneList": "Aller à la page de la liste des avions",
+  "goToFlightsList": "Aller à la page de la liste des vols",
+  "goToReservation": "Aller à la page des réservations",
+  "Reservation Page": "Page de réservation"
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'app_localizations.dart';
-import 'customer_list_page.dart';
-import '../airplane_list_page.dart';
-import '../flights_list_page.dart';
-import '../reservation_page.dart';
+import 'Airplane/airplane_list_page.dart';
+// import 'Customer/app_localizations.dart';
+import 'Customer/customer_list_page.dart';
+import 'Reservation/ReservationListPage.dart';
+import 'flights_list_page.dart';
+import 'AppLocalizations.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en', 'CA');
 
-  void _changeLanguage(Locale locale) {
+  void changeLanguage(Locale locale) {
     setState(() {
       _locale = locale;
     });
@@ -47,7 +48,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: MyHomePage(
         title: AppLocalizations.of(context)?.translate('mainPage') ?? 'Main Page',
-        onLocaleChange: _changeLanguage,
+        changeLanguage: changeLanguage,
       ),
     );
   }
@@ -55,9 +56,9 @@ class _MyAppState extends State<MyApp> {
 
 class MyHomePage extends StatelessWidget {
   final String title;
-  final void Function(Locale locale) onLocaleChange;
+  final  Function(Locale) changeLanguage;
 
-  const MyHomePage({super.key, required this.title, required this.onLocaleChange});
+  const MyHomePage({super.key, required this.title, required this.changeLanguage});
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +82,7 @@ class MyHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CustomerListPage(onLocaleChange: onLocaleChange)),
+                  MaterialPageRoute(builder: (context) => CustomerListPage(onLocaleChange: changeLanguage)),
                 );
               },
               child: Text(AppLocalizations.of(context)?.translate('goToCustomerList') ?? 'Go to Customer List Page'),
@@ -90,7 +91,7 @@ class MyHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AirplaneListPage()),
+                  MaterialPageRoute(builder: (context) => const AirplaneListPage()),
                 );
               },
               child: Text(AppLocalizations.of(context)?.translate('goToAirplaneList') ?? 'Go to Airplane List Page'),
@@ -104,11 +105,12 @@ class MyHomePage extends StatelessWidget {
               },
               child: Text(AppLocalizations.of(context)?.translate('goToFlightsList') ?? 'Go to Flights List Page'),
             ),
+
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ReservationPage()),
+                  MaterialPageRoute(builder: (context) => ReservationListPage()),
                 );
               },
               child: Text(AppLocalizations.of(context)?.translate('goToReservation') ?? 'Go to Reservation Page'),
@@ -145,14 +147,14 @@ class MyHomePage extends StatelessWidget {
           ElevatedButton(
             child: const Text('English'),
             onPressed: () {
-              onLocaleChange(const Locale('en', 'CA'));
+              changeLanguage(const Locale('en', 'CA'));
               Navigator.pop(context);
             },
           ),
           ElevatedButton(
             child: const Text('French'),
             onPressed: () {
-              onLocaleChange(const Locale('fr', 'FR'));
+              changeLanguage(const Locale('fr', 'FR'));
               Navigator.pop(context);
             },
           ),

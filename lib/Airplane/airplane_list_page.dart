@@ -3,7 +3,7 @@ import 'package:final_project/Airplane/AirplaneDB.dart';
 import 'package:flutter/material.dart';
 import 'Airplane.dart';
 import 'AirplaneDAO.dart';
-import 'AppLocalizations.dart';
+import '../AppLocalizations.dart';
 
 ///creates the AirplaneListPage
 class AirplaneListPage extends StatefulWidget {

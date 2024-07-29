@@ -3,12 +3,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'Reservation.dart';
 import 'ReservationDAO.dart';
 import 'ReservationDB.dart';
-import 'app_localizations.dart';
+import 'package:final_project/AppLocalizations.dart';
 
 class ReservationListPage extends StatefulWidget {
-  final ReservationDatabase database;
+  late  ReservationDatabase database;
 
-  const ReservationListPage({super.key, required this.database});
+  ReservationListPage({super.key});
 
   @override
   State<StatefulWidget> createState() => _ReservationListPageState();
@@ -28,7 +28,13 @@ class _ReservationListPageState extends State<ReservationListPage> {
     _customerIdController = TextEditingController();
     _flightIdController = TextEditingController();
     _dateController = TextEditingController();
-    _loadReservations();
+    WidgetsFlutterBinding.ensureInitialized();
+    $FloorReservationDatabase.databaseBuilder('ReservationDB.db').build()
+    .then((db)async{
+      widget.database = db;
+      _loadReservations();
+    });
+
   }
 
   void _loadReservations() {
@@ -58,14 +64,14 @@ class _ReservationListPageState extends State<ReservationListPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(AppLocalizations.of(context).translate('reservationAdded')),
-            content: Text(AppLocalizations.of(context).translate('reservationAddedContent').replaceFirst('{id}', id.toString())),
+            title: Text(AppLocalizations.of(context)!.translate('reservationAdded')),
+            content: Text(AppLocalizations.of(context)!.translate('reservationAddedContent').replaceFirst('{id}', id.toString())),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text(AppLocalizations.of(context).translate('ok')),
+                child: Text(AppLocalizations.of(context)!.translate('ok')),
               ),
             ],
           );
@@ -97,9 +103,9 @@ class _ReservationListPageState extends State<ReservationListPage> {
   void _showInvalidInputSnackBar() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(AppLocalizations.of(context).translate('invalidInput')),
+        content: Text(AppLocalizations.of(context)!.translate('invalidInput')),
         action: SnackBarAction(
-          label: AppLocalizations.of(context).translate('clear'),
+          label: AppLocalizations.of(context)!.translate('clear'),
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
@@ -111,7 +117,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
   void _showNotFoundSnackBar() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(AppLocalizations.of(context).translate('reservationNotFound')),
+        content: Text(AppLocalizations.of(context)!.translate('reservationNotFound')),
       ),
     );
   }
@@ -126,14 +132,14 @@ class _ReservationListPageState extends State<ReservationListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context).translate('Instructions')),
-        content: Text(AppLocalizations.of(context).translate('instructionsContent')),
+        title: Text(AppLocalizations.of(context)!.translate('Instructions')),
+        content: Text(AppLocalizations.of(context)!.translate('instructionsContent')),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text(AppLocalizations.of(context).translate('ok')),
+            child: Text(AppLocalizations.of(context)!.translate('ok')),
           ),
         ],
       ),
@@ -158,7 +164,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).translate('Reservation Page')),
+        title: Text(AppLocalizations.of(context)!.translate('Reservation Page')),
         actions: [
           IconButton(
             icon: Icon(Icons.translate),
@@ -189,7 +195,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
                               controller: _customerIdController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: AppLocalizations.of(context).translate('enterCustomerId'),
+                                labelText: AppLocalizations.of(context)!.translate('enterCustomerId'),
                               ),
                               keyboardType: TextInputType.number,
                             ),
@@ -200,7 +206,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
                               controller: _flightIdController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: AppLocalizations.of(context).translate('enterFlightId'),
+                                labelText: AppLocalizations.of(context)!.translate('enterFlightId'),
                               ),
                               keyboardType: TextInputType.number,
                             ),
@@ -214,7 +220,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
                                   controller: _dateController,
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(),
-                                    labelText: AppLocalizations.of(context).translate('enterDate'),
+                                    labelText: AppLocalizations.of(context)!.translate('enterDate'),
                                   ),
                                 ),
                               ),
@@ -223,7 +229,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
                           SizedBox(width: 8),
                           ElevatedButton(
                             onPressed: _addReservation,
-                            child: Text(AppLocalizations.of(context).translate('add')),
+                            child: Text(AppLocalizations.of(context)!.translate('add')),
                           ),
                         ],
                       ),
@@ -237,14 +243,14 @@ class _ReservationListPageState extends State<ReservationListPage> {
                           } else if (snapshot.hasError) {
                             return Center(child: Text('Error: ${snapshot.error}'));
                           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Center(child: Text(AppLocalizations.of(context).translate('noReservationsFound')));
+                            return Center(child: Text(AppLocalizations.of(context)!.translate('noReservationsFound')));
                           } else {
                             return ListView.builder(
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, index) {
                                 final reservation = snapshot.data![index];
                                 return ListTile(
-                                  title: Text('${AppLocalizations.of(context).translate('reservation')} ${reservation.id}'),
+                                  title: Text('${AppLocalizations.of(context)!.translate('reservation')} ${reservation.id}'),
                                   onTap: () {
                                     setState(() {
                                       _selectedReservation = reservation;
@@ -270,20 +276,20 @@ class _ReservationListPageState extends State<ReservationListPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        AppLocalizations.of(context).translate('reservationDetails'),
+                        AppLocalizations.of(context)!.translate('reservationDetails'),
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 16),
-                      Text('${AppLocalizations.of(context).translate('customerId').replaceFirst('{customerId}', _selectedReservation!.customerId.toString())}', style: TextStyle(fontSize: 18)),
-                      Text('${AppLocalizations.of(context).translate('flightId').replaceFirst('{flightId}', _selectedReservation!.flightId.toString())}', style: TextStyle(fontSize: 18)),
-                      Text('${AppLocalizations.of(context).translate('date').replaceFirst('{date}', _selectedReservation!.date)}', style: TextStyle(fontSize: 18)),
+                      Text('${AppLocalizations.of(context)!.translate('customerId').replaceFirst('{customerId}', _selectedReservation!.customerId.toString())}', style: TextStyle(fontSize: 18)),
+                      Text('${AppLocalizations.of(context)!.translate('flightId').replaceFirst('{flightId}', _selectedReservation!.flightId.toString())}', style: TextStyle(fontSize: 18)),
+                      Text('${AppLocalizations.of(context)!.translate('date').replaceFirst('{date}', _selectedReservation!.date)}', style: TextStyle(fontSize: 18)),
                       SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: Text(AppLocalizations.of(context).translate('deleteConfirmation')),
+                              title: Text(AppLocalizations.of(context)!.translate('deleteConfirmation')),
                               actions: [
                                 ElevatedButton(
                                   onPressed: () {
@@ -293,22 +299,22 @@ class _ReservationListPageState extends State<ReservationListPage> {
                                       _selectedReservation = null;
                                     });
                                   },
-                                  child: Text(AppLocalizations.of(context).translate('delete')),
+                                  child: Text(AppLocalizations.of(context)!.translate('delete')),
                                 ),
                                 ElevatedButton(
                                   onPressed: () => Navigator.of(context).pop(),
-                                  child: Text(AppLocalizations.of(context).translate('cancel')),
+                                  child: Text(AppLocalizations.of(context)!.translate('cancel')),
                                 ),
                               ],
                             ),
                           );
                         },
-                        child: Text(AppLocalizations.of(context).translate('delete')),
+                        child: Text(AppLocalizations.of(context)!.translate('delete')),
                       ),
                     ],
                   ),
                 )
-                    : Center(child: Text(AppLocalizations.of(context).translate('previousCustomerInformation'))),
+                    : Center(child: Text(AppLocalizations.of(context)!.translate('previousCustomerInformation'))),
               ),
             ],
           ),

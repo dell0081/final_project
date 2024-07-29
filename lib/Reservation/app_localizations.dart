@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class AppLocalizations {
+  final Locale locale;
   AppLocalizations(this.locale);
 
-  final Locale locale;
+
 
   // Singleton pattern to ensure only one instance is used
   static AppLocalizations? _instance;

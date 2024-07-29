@@ -5,15 +5,20 @@ import 'ReservationListPage.dart'; // Import the updated page
 import 'app_localizations.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final database = await $FloorReservationDatabase.databaseBuilder('ReservationDB.db').build();
-  runApp(MyApp(database));
+
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  final ReservationDatabase database;
+class MyApp extends StatefulWidget {
+  late ReservationDatabase database;
 
-  MyApp(this.database);
+
+  MyApp( {super.key});
+
+  @override
+  State<StatefulWidget> createState() {
+       return MyApp();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ReservationListPage(database: database),  // Set the new page as the home
+      home: ReservationListPage(),  // Set the new page as the home
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -35,3 +40,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
