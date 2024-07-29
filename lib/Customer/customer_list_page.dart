@@ -350,9 +350,9 @@ class CustomerListPageState extends State<CustomerListPage> {
       _customersBirthdayController
     ];
     names = <String>["FirstName", "LastName", "Address", "Birthday"];
-
+    WidgetsFlutterBinding.ensureInitialized();
     $FloorCustomerDatabase
-        .databaseBuilder('app_database.db')
+        .databaseBuilder('app_database2.db')
         .build()
         .then((database) async {
       myDAO = database.customerDao;
