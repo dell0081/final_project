@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'Airplane/airplane_list_page.dart';
-// import 'Customer/app_localizations.dart';
 import 'Customer/customer_list_page.dart';
 import 'Reservation/ReservationListPage.dart';
-import 'flights_list_page.dart';
+import 'Flight/flights_list_page.dart';
 import 'AppLocalizations.dart';
 
 void main() {
   runApp(const MyApp());
 }
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
 
 class MyHomePage extends StatelessWidget {
   final String title;
-  final  Function(Locale) changeLanguage;
+  final Function(Locale) changeLanguage;
 
   const MyHomePage({super.key, required this.title, required this.changeLanguage});
 
@@ -100,12 +100,11 @@ class MyHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => FlightsListPage()),
+                  MaterialPageRoute(builder: (context) => FlightsListPage(changeLanguage: changeLanguage)),
                 );
               },
               child: Text(AppLocalizations.of(context)?.translate('goToFlightsList') ?? 'Go to Flights List Page'),
             ),
-
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -169,6 +168,3 @@ class MyHomePage extends StatelessWidget {
     );
   }
 }
-
-
-
