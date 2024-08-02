@@ -4,15 +4,17 @@ import 'database.dart';
 import 'flight_dao.dart';
 import 'flight_details_page.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
-import '../AppLocalizations.dart'; // Correct import path
+import '../AppLocalizations.dart';
 
 /// A page that displays a list of flights and allows for adding, updating, and deleting flights.
 ///
 /// The [FlightsListPage] is a stateful widget that interacts with the database to manage flights.
 /// It also supports language toggling.
 class FlightsListPage extends StatefulWidget {
-  final Function(Locale) changeLanguage; // Ensure this parameter is defined
+  /// Callback function to be called when the language is changed.
+  final Function(Locale) changeLanguage;
 
+  /// Constructs a [FlightsListPage] widget.
   const FlightsListPage({Key? key, required this.changeLanguage}) : super(key: key);
 
   @override
@@ -168,12 +170,38 @@ class _FlightsListPageState extends State<FlightsListPage> {
     );
   }
 
+  /// Shows an instructions dialog with the relevant information.
+  void _showInstructionsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)?.translate('instructionsf') ?? 'Instructions'),
+        content: Text(
+          AppLocalizations.of(context)?.translate('flight_instructionsf') ??
+              'Please enter the required details in the form fields:\n\n1. **Departure City**: Enter the city from which the flight departs.\n2. **Destination City**: Enter the city where the flight will arrive.\n3. **Departure Time**: Enter the departure time in the format HH:MM.\n4. **Arrival Time**: Enter the arrival time in the format HH:MM.\n\nMake sure all fields are filled correctly before adding a flight.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(AppLocalizations.of(context)?.translate('ok') ?? 'OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)?.translate('go_to_flights_list_page') ?? 'Flights List Page'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.help),
+            onPressed: () {
+              _showInstructionsDialog(context);
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.language),
             onPressed: () {
@@ -273,6 +301,9 @@ class _FlightsListPageState extends State<FlightsListPage> {
     );
   }
 
+  /// Shows a dialog for selecting the language.
+  ///
+  /// The dialog provides options for switching between English and French.
   void _showLanguageDialog(BuildContext context) {
     showDialog<String>(
       context: context,

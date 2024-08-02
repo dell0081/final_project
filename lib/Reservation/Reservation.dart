@@ -9,5 +9,5 @@ class Reservation {
   final String date; // Format: YYYY-MM-DD
 
   Reservation(this.id, this.customerId, this.flightId, this.date);
-  // simple constructor
+// simple constructor
 }

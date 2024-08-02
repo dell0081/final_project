@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../AppLocalizations.dart'; // Correct import path
+import '../AppLocalizations.dart';
 import 'flight.dart';
 import 'database.dart';
 import 'flight_dao.dart';
@@ -147,11 +147,16 @@ class _FlightDetailsPageState extends State<FlightDetailsPage> {
           decoration: InputDecoration(labelText: AppLocalizations.of(context)?.translate('arrival_time') ?? 'Arrival Time'),
         ),
         ElevatedButton(
-          onPressed: _updateFlight,
+          onPressed: () {
+            _showUpdateConfirmationDialog(context);
+          },
           child: Text(AppLocalizations.of(context)?.translate('update_flight') ?? 'Update Flight'),
         ),
         ElevatedButton(
-          onPressed: _deleteFlight,
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: () {
+            _showDeleteConfirmationDialog(context);
+          },
           child: Text(AppLocalizations.of(context)?.translate('delete_flight') ?? 'Delete Flight'),
         ),
       ],
@@ -177,6 +182,9 @@ class _FlightDetailsPageState extends State<FlightDetailsPage> {
     }
   }
 
+  /// Shows a dialog for selecting the language.
+  ///
+  /// The dialog provides options for switching between English and French.
   void _showLanguageDialog(BuildContext context) {
     showDialog<String>(
       context: context,
@@ -222,6 +230,96 @@ class _FlightDetailsPageState extends State<FlightDetailsPage> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Shows a dialog for confirming the deletion of a flight.
+  ///
+  /// The dialog provides options to confirm or cancel the deletion.
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Confirm Delete',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          content: Text('Are you sure you want to delete this flight?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                _deleteFlight();
+                Navigator.of(context).pop();
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Shows a dialog for confirming the update of a flight.
+  ///
+  /// The dialog provides options to confirm or cancel the update.
+  void _showUpdateConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Confirm Update',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          content: Text('Are you sure you want to update this flight?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                _updateFlight();
+                Navigator.of(context).pop();
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
