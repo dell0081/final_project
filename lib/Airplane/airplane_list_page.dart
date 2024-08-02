@@ -122,14 +122,14 @@ class AirplaneListPageCreate extends State<AirplaneListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(translate('pageTitle')),
+        title: Text(translate('pageTitleA')),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Text(translate('title'),
+            Text(translate('titleA'),
                 style:
                 const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             Row(
