@@ -29,7 +29,6 @@
   "reservationDetails": "Détails de la Réservation",
   "customerId": "ID du client: {customerId}",
   "flightId": "ID du vol: {flightId}",
-  "delete": "Supprimer",
   "clear": "Effacer",
   "reservationAdded": "Réservation Ajoutée",
   "reservationAddedContent": "Réservation avec ID {id} a été ajoutée avec succès.",
@@ -63,7 +62,7 @@
   "title": "Page Principale",
   "go_to_customer_list_page": "Aller à la page de la liste des clients",
   "go_to_airplane_list_page": "Aller à la page de la liste des avions",
-  "go_to_flights_list_page": "Aller à la page de la liste des vols",
+  "go_to_flights_list_page": "Page de liste des vols",
   "go_to_reservation_page": "Aller à la page de réservation",
   "flight_added": "Vol ajouté",
   "flight_updated": "Vol mis à jour",
@@ -86,5 +85,6 @@
   "date": "Date",
   "flight_details": "Détails du vol",
   "reservation_page_title": "Page de Réservation",
-  "reservation_page_content": "Ceci est la page de réservation"
+  "reservation_page_content": "Ceci est la page de réservation",
+  "delete": "Supprimer"
 }

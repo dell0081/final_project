@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'Reservation.dart';
 import 'ReservationDAO.dart';
 import 'ReservationDB.dart';
-import 'package:final_project/AppLocalizations.dart';
+import '../AppLocalizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ReservationListPage extends StatefulWidget {
@@ -68,7 +68,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(AppLocalizations.of(context)!.translate('reservationAdded') ?? 'Reservation Added'),
-            content: Text(AppLocalizations.of(context)!.translate('reservationAddedContent')!.replaceFirst('{id}', id.toString()) ?? 'Reservation with ID {id} has been added successfully.'),
+            content: Text(AppLocalizations.of(context)!.translate('reservationAddedContent').replaceFirst('{id}', id.toString()) ?? 'Reservation with ID {id} has been added successfully.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -218,7 +218,7 @@ class _ReservationListPageState extends State<ReservationListPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.translate('reservationPage') ?? 'Reservation Page'),
+        title: Text(AppLocalizations.of(context)!.translate('reservation_page_title') ?? 'Reservation Page'),
         actions: [
           IconButton(
             icon: Icon(Icons.translate),

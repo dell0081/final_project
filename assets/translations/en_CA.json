@@ -63,7 +63,7 @@
   "title": "Main Page",
   "go_to_customer_list_page": "Go to Customer List Page",
   "go_to_airplane_list_page": "Go to Airplane List Page",
-  "go_to_flights_list_page": "Go to Flights List Page",
+  "go_to_flights_list_page": "Flights List Page",
   "go_to_reservation_page": "Go to Reservation Page",
   "flight_added": "Flight added",
   "flight_updated": "Flight updated",
@@ -86,5 +86,8 @@
   "date": "Date",
   "flight_details": "Flight Details",
   "reservation_page_title": "Reservation Page",
-  "reservation_page_content": "This is the Reservation Page"
+  "reservation_page_content": "This is the Reservation Page",
+  "Addedreservation": "Added reservation",
+  "reservation": "Reservation",
+  "DeletedReservation": "reservation deleted"
 }
